@@ -1,5 +1,6 @@
-import ReactFlow, { Background, Controls, type Edge, type Node } from "reactflow";
 import "reactflow/dist/style.css";
+
+import ReactFlow, { Background, Controls, type Edge, type Node } from "reactflow";
 
 const nodes: Node[] = [{ id: "1", position: { x: 0, y: 0 }, data: { label: "Hello" } }];
 const edges: Edge[] = [];
