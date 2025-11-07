@@ -2,12 +2,12 @@ import { Link } from "react-router-dom";
 
 export function Navbar() {
     return (
-        <nav className="flex items-center justify-between bg-blue-600 text-white px-6 py-3">
-            <h1 className="text-x1 font-bold">AppGen</h1>
-            <div className="space-x-4">
-                <Link to="/">Home</Link>
-                <Link to="/schemas">Schemas</Link>
-                <Link to="/logout">Logout</Link>
+        <nav className="flex items-center justify-between bg-white border-b border-secondary-200 px-6 py-4 shadow-sm">
+            <h1 className="text-xl font-bold text-secondary-900">AppGen</h1>
+            <div className="flex items-center space-x-8">
+                <Link to="/" className="text-secondary-700 hover:text-primary-600 transition-colors font-medium">Home</Link>
+                <Link to="/schemas" className="text-secondary-700 hover:text-primary-600 transition-colors font-medium">Schemas</Link>
+                <Link to="/logout" className="text-secondary-700 hover:text-primary-600 transition-colors font-medium">Logout</Link>
             </div>
         </nav>
     );
