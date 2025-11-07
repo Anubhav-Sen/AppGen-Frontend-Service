@@ -1,9 +1,9 @@
-import SampleForm from "./components/SampleForm"
-import { useUIStore } from "./stores/ui"
+import SampleForm from "./components/SampleForm";
+import { useUIStore } from "./stores/ui";
 
 function App() {
-  const sidebarOpen = useUIStore((s) => s.sidebarOpen)
-  const toggleSidebar = useUIStore((s) => s.toggleSidebar)
+  const sidebarOpen = useUIStore((s) => s.sidebarOpen);
+  const toggleSidebar = useUIStore((s) => s.toggleSidebar);
 
   return (
     <div className="p-6">
@@ -25,7 +25,7 @@ function App() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
