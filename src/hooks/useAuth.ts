@@ -1,14 +1,18 @@
 import { useAuthStore } from "../stores/authStore";
-import { getCurrentUser } from "../api/user";
+import { auth, type LoginPayload } from "../api/auth";
 
 export function useAuth() {
     const { user, setUser } = useAuthStore();
 
-    async function login(username: string, password: string) {
-        console.log(`Logging in ${username}`);
-        const loggedIn = await getCurrentUser();
-        setUser(loggedIn);
+    async function login(payload: LoginPayload) {
+        const response = await auth.login(payload);
+        setUser(response.user);
+        return response;
     }
 
-    return {user, login };
+    function logout() {
+        setUser(null);
+    }
+
+    return { user, login, logout };
 }

@@ -1,24 +1,16 @@
-import axios from "axios";
+import { api } from "./client";
+import type { User } from "../types/user";
 
 export interface LoginPayload {
-    email: string
-    password: string
+    email: string;
+    password: string;
 }
 
 export interface LoginResponse {
     accessToken: string;
-    refeshToken?: string;
-    user: {
-        id: string;
-        email: string;
-        name?: string;
-    };
+    refreshToken?: string;
+    user: User;
 }
-
-const api = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api",
-    withCredentials: true,
-});
 
 export const auth = {
     async login(payload: LoginPayload): Promise<LoginResponse> {
