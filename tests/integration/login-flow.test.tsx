@@ -122,13 +122,15 @@ describe("Login Flow Integration", () => {
         await user.type(screen.getByLabelText("Password"), "short");
         await user.click(screen.getByRole("button", { name: /Sign in/i }));
 
-        // API should not be called
+        // Wait for validation errors
         await waitFor(() => {
-            expect(mockAuth.login).not.toHaveBeenCalled();
+            expect(screen.getByText(/valid email/i)).toBeInTheDocument();
         });
 
-        // Validation errors should be shown
-        expect(screen.getByText(/valid email/i)).toBeInTheDocument();
+        // API should not be called
+        expect(mockAuth.login).not.toHaveBeenCalled();
+
+        // Both validation errors should be shown
         expect(screen.getByText(/8 characters/i)).toBeInTheDocument();
     });
 

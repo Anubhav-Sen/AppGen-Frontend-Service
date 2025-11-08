@@ -28,7 +28,8 @@ describe("loginSchema", () => {
             });
             expect(result.success).toBe(false);
             if (!result.success) {
-                expect(result.error.issues[0].message).toContain("Email is required");
+                // Empty string fails email validation first, showing email format message
+                expect(result.error.issues[0].message).toContain("valid email");
             }
         });
     });

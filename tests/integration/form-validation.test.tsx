@@ -59,7 +59,7 @@ describe("Form Validation Integration", () => {
             await user.click(screen.getByRole("button", { name: "Submit" }));
 
             await waitFor(() => {
-                expect(screen.getByText("Invalid email")).toBeInTheDocument();
+                expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
             });
         });
 

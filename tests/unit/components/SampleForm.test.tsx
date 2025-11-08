@@ -52,7 +52,8 @@ describe("SampleForm", () => {
         await user.click(screen.getByRole("button", { name: "Submit" }));
 
         await waitFor(() => {
-            expect(screen.getByText("Invalid email")).toBeInTheDocument();
+            // Zod v4 email validation message
+            expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
         });
     });
 

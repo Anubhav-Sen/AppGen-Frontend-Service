@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import type { LoginResponse } from "@/api/auth";
 
 // Mock the useAuth hook
-jest.mock("../../hooks/useAuth", () => ({
+jest.mock("@/hooks/useAuth", () => ({
     useAuth: jest.fn(),
 }));
 
