@@ -14,14 +14,25 @@ jest.mock("@/api/auth", () => ({
 
 // Mock zustand store
 let mockUser: unknown = null;
+let mockAccessToken: string | null = null;
 const mockSetUser = jest.fn((user) => {
     mockUser = user;
+});
+const mockSetAccessToken = jest.fn((token) => {
+    mockAccessToken = token;
+});
+const mockClearAuth = jest.fn(() => {
+    mockUser = null;
+    mockAccessToken = null;
 });
 
 jest.mock("@/stores/authStore", () => ({
     useAuthStore: jest.fn(() => ({
         user: mockUser,
+        accessToken: mockAccessToken,
         setUser: mockSetUser,
+        setAccessToken: mockSetAccessToken,
+        clearAuth: mockClearAuth,
     })),
 }));
 
@@ -32,6 +43,7 @@ describe("Login Flow Integration", () => {
     beforeEach(() => {
         jest.clearAllMocks();
         mockUser = null;
+        mockAccessToken = null;
         queryClient = new QueryClient({
             defaultOptions: {
                 queries: { retry: false },

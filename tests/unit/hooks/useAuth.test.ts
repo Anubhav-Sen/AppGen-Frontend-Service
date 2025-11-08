@@ -14,7 +14,10 @@ jest.mock("@/api/auth", () => ({
 jest.mock("@/stores/authStore", () => ({
     useAuthStore: jest.fn(() => ({
         user: null,
+        accessToken: null,
         setUser: jest.fn(),
+        setAccessToken: jest.fn(),
+        clearAuth: jest.fn(),
     })),
 }));
 
