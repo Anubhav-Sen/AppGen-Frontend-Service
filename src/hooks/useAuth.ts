@@ -1,5 +1,5 @@
-import { useAuthStore } from "../stores/authStore";
-import { auth, type LoginPayload } from "../api/auth";
+import { useAuthStore } from "@/stores/authStore";
+import { auth, type LoginPayload } from "@/api/auth";
 
 export function useAuth() {
     const { user, setUser } = useAuthStore();

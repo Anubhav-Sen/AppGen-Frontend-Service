@@ -1,5 +1,5 @@
-import { api } from "./client";
-import type { User } from "../types/user";
+import { api } from "@/api/client";
+import type { User } from "@/types/user";
 
 export interface LoginPayload {
     email: string;

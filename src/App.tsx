@@ -1,9 +1,9 @@
 import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Navbar } from "./components/Navbar";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/auth/LoginPage";
-import Flows from "./pages/Flows";
+import { Navbar } from "@/components/Navbar";
+import HomePage from "@/pages/HomePage";
+import LoginPage from "@/pages/auth/LoginPage";
+import Flows from "@/pages/Flows";
 
 const queryClient = new QueryClient();
 

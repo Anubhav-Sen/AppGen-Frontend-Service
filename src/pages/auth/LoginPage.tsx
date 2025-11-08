@@ -1,11 +1,11 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "../../hooks/useAuth";
-import { loginSchema, type LoginFormValues } from "../../lib/schemas/auth";
-import { getErrorMessage } from "../../lib/utils/error";
-import { FormInput } from "../../components/ui/FormInput";
-import { Alert } from "../../components/ui/Alert";
+import { useAuth } from "@/hooks/useAuth";
+import { loginSchema, type LoginFormValues } from "@/lib/schemas/auth";
+import { getErrorMessage } from "@/lib/utils/error";
+import { FormInput } from "@/components/ui/FormInput";
+import { Alert } from "@/components/ui/Alert";
 
 const LoginPage: React.FC = () => {
     const { login } = useAuth();
