@@ -24,7 +24,7 @@ export default function SampleForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
       <FormInput
         label="Name"
         placeholder="Name"

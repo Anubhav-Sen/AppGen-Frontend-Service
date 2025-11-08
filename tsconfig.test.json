@@ -2,10 +2,16 @@
   "extends": "./tsconfig.app.json",
   "compilerOptions": {
     "noEmit": true,
-    "types": ["jest", "@testing-library/jest-dom"],
+    "jsx": "react-jsx",
+    "types": ["jest", "@testing-library/jest-dom", "node"],
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["tests/**/*", "src/setupTests.ts"]
+  "include": ["tests/**/*", "src/setupTests.ts", "src/**/*.test.ts", "src/**/*.test.tsx"]
 }

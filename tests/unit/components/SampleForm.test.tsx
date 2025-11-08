@@ -47,13 +47,16 @@ describe("SampleForm", () => {
         const user = userEvent.setup();
         render(<SampleForm />);
 
-        await user.type(screen.getByLabelText("Name"), "John Doe");
-        await user.type(screen.getByLabelText("Email"), "invalid-email");
+        const nameInput = screen.getByLabelText("Name");
+        const emailInput = screen.getByLabelText("Email");
+
+        await user.type(nameInput, "John Doe");
+        await user.type(emailInput, "invalid-email");
         await user.click(screen.getByRole("button", { name: "Submit" }));
 
         await waitFor(() => {
-            // Zod v4 email validation message
-            expect(screen.getByText(/invalid email/i)).toBeInTheDocument();
+            // Zod email validation message shows "Invalid email"
+            expect(screen.getByText("Invalid email")).toBeInTheDocument();
         });
     });
 

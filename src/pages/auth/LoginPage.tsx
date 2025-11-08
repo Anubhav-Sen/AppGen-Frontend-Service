@@ -54,7 +54,7 @@ const LoginPage: React.FC = () => {
                 {serverError && <Alert type="error">{serverError}</Alert>}
                 {serverSuccess && <Alert type="success">{serverSuccess}</Alert>}
 
-                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
                     <FormInput
                         label="Email"
                         type="email"

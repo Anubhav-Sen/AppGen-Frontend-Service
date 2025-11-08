@@ -13,6 +13,8 @@ const config: Config = {
           esModuleInterop: true,
           allowSyntheticDefaultImports: true,
           verbatimModuleSyntax: false,
+          skipLibCheck: true,
+          types: ["jest", "@testing-library/jest-dom", "node"],
           baseUrl: ".",
           paths: {
             "@/*": ["./src/*"]
