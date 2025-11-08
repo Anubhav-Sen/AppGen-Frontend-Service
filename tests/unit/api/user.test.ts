@@ -1,9 +1,9 @@
-import { getCurrentUser } from "./user";
-import { api } from "./client";
-import type { User } from "../types/user";
+import { getCurrentUser } from "@/api/user";
+import { api } from "@/api/client";
+import type { User } from "@/types/user";
 
 // Mock the axios client
-jest.mock("./client", () => ({
+jest.mock("@/api/client", () => ({
     api: {
         get: jest.fn(),
     },

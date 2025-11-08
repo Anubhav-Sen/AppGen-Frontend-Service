@@ -1,17 +1,17 @@
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { useAuth } from "./useAuth";
-import { auth } from "../api/auth";
-import type { LoginResponse } from "../api/auth";
+import { renderHook, act } from "@testing-library/react";
+import { useAuth } from "@/hooks/useAuth";
+import { auth } from "@/api/auth";
+import type { LoginResponse } from "@/api/auth";
 
 // Mock the API module
-jest.mock("../api/auth", () => ({
+jest.mock("@/api/auth", () => ({
     auth: {
         login: jest.fn(),
     },
 }));
 
 // Mock zustand store
-jest.mock("../stores/authStore", () => ({
+jest.mock("@/stores/authStore", () => ({
     useAuthStore: jest.fn(() => ({
         user: null,
         setUser: jest.fn(),

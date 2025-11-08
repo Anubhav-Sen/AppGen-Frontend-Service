@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { Alert } from "./Alert";
+import { Alert } from "@/components/ui/Alert";
 
 describe("Alert", () => {
     it("should render error alert with correct styling", () => {

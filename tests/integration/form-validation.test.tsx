@@ -1,18 +1,18 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import SampleForm from "../../components/SampleForm";
-import LoginPage from "../../pages/auth/LoginPage";
+import SampleForm from "@/components/SampleForm";
+import LoginPage from "@/pages/auth/LoginPage";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Mock the auth module
-jest.mock("../../api/auth", () => ({
+jest.mock("@/api/auth", () => ({
     auth: {
         login: jest.fn(),
     },
 }));
 
 // Mock the auth store
-jest.mock("../../stores/authStore", () => ({
+jest.mock("@/stores/authStore", () => ({
     useAuthStore: jest.fn(() => ({
         user: null,
         setUser: jest.fn(),

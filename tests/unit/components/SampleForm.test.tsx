@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import SampleForm from "./SampleForm";
+import SampleForm from "@/components/SampleForm";
 
 describe("SampleForm", () => {
     it("should render form with name and email fields", () => {

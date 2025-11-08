@@ -1,4 +1,4 @@
-import { getErrorMessage } from "./error";
+import { getErrorMessage } from "@/lib/utils/error";
 
 describe("getErrorMessage", () => {
     it("should return default message for non-object errors", () => {

@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
-import { useAuthStore } from "./authStore";
-import type { User } from "../types/user";
+import { useAuthStore } from "@/stores/authStore";
+import type { User } from "@/types/user";
 
 describe("authStore", () => {
     beforeEach(() => {

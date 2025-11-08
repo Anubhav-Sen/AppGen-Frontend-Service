@@ -1,4 +1,4 @@
-import { loginSchema } from "./auth";
+import { loginSchema } from "@/lib/schemas/auth";
 
 describe("loginSchema", () => {
     describe("email validation", () => {

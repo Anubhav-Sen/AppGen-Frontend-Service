@@ -1,12 +1,12 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import LoginPage from "../../pages/auth/LoginPage";
-import { auth } from "../../api/auth";
-import type { LoginResponse } from "../../api/auth";
+import LoginPage from "@/pages/auth/LoginPage";
+import { auth } from "@/api/auth";
+import type { LoginResponse } from "@/api/auth";
 
 // Mock the API module
-jest.mock("../../api/auth", () => ({
+jest.mock("@/api/auth", () => ({
     auth: {
         login: jest.fn(),
     },
@@ -18,7 +18,7 @@ const mockSetUser = jest.fn((user) => {
     mockUser = user;
 });
 
-jest.mock("../../stores/authStore", () => ({
+jest.mock("@/stores/authStore", () => ({
     useAuthStore: jest.fn(() => ({
         user: mockUser,
         setUser: mockSetUser,

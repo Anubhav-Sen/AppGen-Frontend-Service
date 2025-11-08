@@ -1,9 +1,9 @@
-import { auth } from "./auth";
-import { api } from "./client";
-import type { LoginPayload, LoginResponse } from "./auth";
+import { auth } from "@/api/auth";
+import { api } from "@/api/client";
+import type { LoginPayload, LoginResponse } from "@/api/auth";
 
 // Mock the axios client
-jest.mock("./client", () => ({
+jest.mock("@/api/client", () => ({
     api: {
         post: jest.fn(),
     },
