@@ -26,6 +26,7 @@ const config: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
     "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+    "^nanoid$": "<rootDir>/tests/mocks/nanoid.ts",
   },
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
   testMatch: [
@@ -33,6 +34,9 @@ const config: Config = {
     "<rootDir>/tests/**/*.spec.{ts,tsx}",
   ],
   testPathIgnorePatterns: ["/node_modules/", "/dist/"],
+  transformIgnorePatterns: [
+    "node_modules/(?!(nanoid)/)",
+  ],
   collectCoverageFrom: [
     "src/**/*.{ts,tsx}",
     "!src/**/*.d.ts",
