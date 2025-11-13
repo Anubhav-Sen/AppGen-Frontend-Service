@@ -3,8 +3,8 @@ import { Handle, Position } from "@xyflow/react";
 import type { NodeProps } from "@xyflow/react";
 import type { EnumNodeData } from "@/types/reactFlow";
 
-function EnumNode({ data, selected }: NodeProps<EnumNodeData>) {
-  const { enum: enumDef } = data;
+function EnumNode({ data, selected }: NodeProps) {
+  const enumDef = (data as EnumNodeData).enum;
 
   return (
     <div
@@ -28,7 +28,7 @@ function EnumNode({ data, selected }: NodeProps<EnumNodeData>) {
           <div className="text-xs text-gray-400 italic">No values</div>
         ) : (
           <div className="space-y-1">
-            {enumDef.values.slice(0, 5).map((value) => (
+            {enumDef.values.slice(0, 5).map((value: string) => (
               <div key={value} className="text-sm text-gray-700">
                 • {value}
               </div>
