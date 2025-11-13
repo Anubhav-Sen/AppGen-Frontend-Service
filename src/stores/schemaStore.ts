@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { nanoid } from "nanoid";
 import {
   type ModelWithUI,
@@ -41,10 +42,12 @@ interface SchemaState {
   clearAll: () => void;
 }
 
-export const useSchemaStore = create<SchemaState>((set, get) => ({
-  models: [],
-  enums: [],
-  associationTables: [],
+export const useSchemaStore = create<SchemaState>()(
+  persist(
+    (set, get) => ({
+      models: [],
+      enums: [],
+      associationTables: [],
 
   addModel: (model) => {
     const id = nanoid();
@@ -224,4 +227,9 @@ export const useSchemaStore = create<SchemaState>((set, get) => ({
       associationTables: [],
     });
   },
-}));
+}),
+    {
+      name: "schema-storage",
+    }
+  )
+);

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import {
   type ProjectConfig,
   type GitConfig,
@@ -55,12 +56,14 @@ const defaultToken: TokenConfig = {
   refresh_token_expire_days: 7,
 };
 
-export const useConfigStore = create<ConfigState>((set) => ({
-  project: defaultProject,
-  git: defaultGit,
-  database: defaultDatabase,
-  security: defaultSecurity,
-  token: defaultToken,
+export const useConfigStore = create<ConfigState>()(
+  persist(
+    (set) => ({
+      project: defaultProject,
+      git: defaultGit,
+      database: defaultDatabase,
+      security: defaultSecurity,
+      token: defaultToken,
 
   setProject: (config) => {
     set((state) => ({
@@ -101,4 +104,9 @@ export const useConfigStore = create<ConfigState>((set) => ({
       token: defaultToken,
     });
   },
-}));
+}),
+    {
+      name: "config-storage",
+    }
+  )
+);
