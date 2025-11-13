@@ -5,6 +5,7 @@ import HomePage from "@/pages/HomePage";
 import LoginPage from "@/pages/auth/LoginPage";
 import Flows from "@/pages/Flows";
 import SchemaBuilder from "@/pages/SchemaBuilder";
+import ConfigPage from "@/pages/ConfigPage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +26,7 @@ const router = createBrowserRouter([
       { path: "/login", element: <LoginPage /> },
       { path: "/flows", element: <Flows /> },
       { path: "/builder", element: <SchemaBuilder /> },
+      { path: "/config", element: <ConfigPage /> },
     ],
   },
 ]);
