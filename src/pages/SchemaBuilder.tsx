@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useEffect } from "react";
 import {
   ReactFlow,
   Background,
@@ -17,10 +17,10 @@ import EnumNode from "@/components/schema/nodes/EnumNode";
 import { modelsToNodes, enumsToNodes, relationshipsToEdges } from "@/lib/utils/flowConverter";
 import { loadSampleData } from "@/lib/utils/sampleData";
 
-const nodeTypes: NodeTypes = {
+const nodeTypes = {
   model: ModelNode,
   enum: EnumNode,
-};
+} as NodeTypes;
 
 export default function SchemaBuilder() {
   const models = useSchemaStore((state) => state.models);
@@ -38,6 +38,14 @@ export default function SchemaBuilder() {
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  useEffect(() => {
+    setNodes(initialNodes as any);
+  }, [initialNodes, setNodes]);
+
+  useEffect(() => {
+    setEdges(initialEdges as any);
+  }, [initialEdges, setEdges]);
 
   const onConnect = useCallback(
     (connection: Connection) => {
