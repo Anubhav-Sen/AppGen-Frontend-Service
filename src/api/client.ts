@@ -7,7 +7,7 @@ import axios, {
 import { useAuthStore } from "@/stores/authStore";
 
 interface RefreshResponse {
-    accessToken: string;
+    access_token: string;
 }
 
 interface AxiosRequestConfigWithRetry extends InternalAxiosRequestConfig {
@@ -30,7 +30,7 @@ async function performTokenRefresh(): Promise<string | null> {
             { withCredentials: true }
         );
 
-        const newAccessToken = response.data.accessToken;
+        const newAccessToken = response.data.access_token;
         setAccessToken(newAccessToken);
 
         return newAccessToken;
