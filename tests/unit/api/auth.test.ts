@@ -22,31 +22,46 @@ describe("auth API", () => {
             password: "password123",
         };
 
-        const mockResponse: LoginResponse = {
+        const mockRawResponse = {
+            access_token: "mock-access-token",
+            refresh_token: "mock-refresh-token",
+            user: {
+                id: 1,
+                email: "test@example.com",
+                username: "testuser",
+                is_active: true,
+            },
+        };
+
+        const mockExpectedResponse: LoginResponse = {
             accessToken: "mock-access-token",
             refreshToken: "mock-refresh-token",
             user: {
                 id: 1,
                 email: "test@example.com",
                 username: "testuser",
+                isActive: true,
             },
         };
 
         it("should call POST /auth/login with correct payload", async () => {
-            mockApi.post.mockResolvedValue({ data: mockResponse });
+            mockApi.post.mockResolvedValue({ data: mockRawResponse });
 
             await auth.login(loginPayload);
 
-            expect(mockApi.post).toHaveBeenCalledWith("/auth/login", loginPayload);
+            expect(mockApi.post).toHaveBeenCalledWith("/auth/login", {
+                email: loginPayload.email,
+                password: loginPayload.password,
+            });
             expect(mockApi.post).toHaveBeenCalledTimes(1);
         });
 
         it("should return login response data", async () => {
-            mockApi.post.mockResolvedValue({ data: mockResponse });
+            mockApi.post.mockResolvedValue({ data: mockRawResponse });
 
             const result = await auth.login(loginPayload);
 
-            expect(result).toEqual(mockResponse);
+            expect(result).toEqual(mockExpectedResponse);
             expect(result.accessToken).toBe("mock-access-token");
             expect(result.user.email).toBe("test@example.com");
         });
@@ -74,7 +89,7 @@ describe("auth API", () => {
         });
 
         it("should pass user object with correct structure", async () => {
-            mockApi.post.mockResolvedValue({ data: mockResponse });
+            mockApi.post.mockResolvedValue({ data: mockRawResponse });
 
             const result = await auth.login(loginPayload);
 
@@ -84,16 +99,17 @@ describe("auth API", () => {
         });
 
         it("should handle response without refreshToken", async () => {
-            const responseWithoutRefresh: LoginResponse = {
-                accessToken: "mock-token",
+            const rawResponseWithoutRefresh = {
+                access_token: "mock-token",
                 user: {
                     id: 1,
                     email: "test@example.com",
                     username: "testuser",
+                    is_active: true,
                 },
             };
 
-            mockApi.post.mockResolvedValue({ data: responseWithoutRefresh });
+            mockApi.post.mockResolvedValue({ data: rawResponseWithoutRefresh });
 
             const result = await auth.login(loginPayload);
 

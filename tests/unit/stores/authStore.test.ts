@@ -24,6 +24,7 @@ describe("authStore", () => {
             id: 1,
             username: "testuser",
             email: "test@example.com",
+            isActive: true,
         };
 
         act(() => {
@@ -40,6 +41,7 @@ describe("authStore", () => {
             id: 1,
             username: "testuser",
             email: "test@example.com",
+            isActive: true,
         };
 
         act(() => {
@@ -62,12 +64,14 @@ describe("authStore", () => {
             id: 1,
             username: "user1",
             email: "user1@example.com",
+            isActive: true,
         };
 
         const user2: User = {
             id: 2,
             username: "user2",
             email: "user2@example.com",
+            isActive: true,
         };
 
         act(() => {
@@ -91,13 +95,13 @@ describe("authStore", () => {
             id: 1,
             username: "testuser",
             email: "test@example.com",
+            isActive: true,
         };
 
         act(() => {
             result1.current.setUser(mockUser);
         });
 
-        // Both instances should see the same state
         expect(result1.current.user).toEqual(mockUser);
         expect(result2.current.user).toEqual(mockUser);
     });

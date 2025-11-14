@@ -53,6 +53,7 @@ describe("LoginPage", () => {
                 id: 1,
                 email: "test@example.com",
                 username: "testuser",
+                isActive: true,
             },
         };
         mockLogin.mockResolvedValue(mockResponse);
@@ -79,6 +80,7 @@ describe("LoginPage", () => {
                 id: 1,
                 email: "test@example.com",
                 username: "testuser",
+                isActive: true,
             },
         };
         mockLogin.mockResolvedValue(mockResponse);
@@ -191,6 +193,7 @@ describe("LoginPage", () => {
                 id: 1,
                 email: "test@example.com",
                 username: "testuser",
+                isActive: true,
             },
         };
         mockLogin.mockResolvedValue(mockResponse);

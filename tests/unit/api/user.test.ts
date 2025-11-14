@@ -21,6 +21,7 @@ describe("user API", () => {
             id: 1,
             username: "testuser",
             email: "test@example.com",
+            isActive: true,
         };
 
         it("should call GET /users/me", async () => {

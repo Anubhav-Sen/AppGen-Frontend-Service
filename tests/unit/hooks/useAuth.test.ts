@@ -29,6 +29,7 @@ describe("useAuth", () => {
             id: 1,
             email: "test@example.com",
             username: "testuser",
+            isActive: true,
         },
     };
 

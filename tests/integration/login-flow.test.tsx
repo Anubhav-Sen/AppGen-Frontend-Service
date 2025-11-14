@@ -67,6 +67,7 @@ describe("Login Flow Integration", () => {
                 id: 1,
                 email: "john@example.com",
                 username: "johndoe",
+                isActive: true,
             },
         };
 
@@ -176,6 +177,7 @@ describe("Login Flow Integration", () => {
                 id: 1,
                 email: "test@example.com",
                 username: "testuser",
+                isActive: true,
             },
         };
         mockAuth.login.mockResolvedValue(mockResponse);
@@ -234,6 +236,7 @@ describe("Login Flow Integration", () => {
                 id: 1,
                 email: "test@example.com",
                 username: "testuser",
+                isActive: true,
             },
         });
 

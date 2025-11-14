@@ -39,7 +39,7 @@ interface UserRaw {
 export const auth = {
     async login(payload: LoginPayload): Promise<LoginResponse> {
         const response = await api.post<LoginResponseRaw>("/auth/login", {
-            username: payload.email,
+            email: payload.email,
             password: payload.password,
         });
         return {
