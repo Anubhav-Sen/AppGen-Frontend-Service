@@ -2,7 +2,12 @@ import type { FastAPIProjectSpec, Model, Schema } from "@/types/fastapiSpec";
 import { useSchemaStore } from "@/stores/schemaStore";
 import { useConfigStore } from "@/stores/configStore";
 
-export function buildFastAPIProjectSpec(): FastAPIProjectSpec {
+export function buildFastAPIProjectSpec(): FastAPIProjectSpec & {
+  _ui_metadata?: {
+    models: Array<{ name: string; position: { x: number; y: number } }>;
+    enums: Array<{ name: string; position: { x: number; y: number } }>;
+  };
+} {
   const schemaState = useSchemaStore.getState();
   const configState = useConfigStore.getState();
 
@@ -30,6 +35,16 @@ export function buildFastAPIProjectSpec(): FastAPIProjectSpec {
     security: configState.security,
     token: configState.token,
     schema,
+    _ui_metadata: {
+      models: schemaState.models.map((m) => ({
+        name: m.name,
+        position: m.position || { x: 100, y: 100 },
+      })),
+      enums: schemaState.enums.map((e) => ({
+        name: e.name,
+        position: e.position || { x: 100, y: 100 },
+      })),
+    },
   };
 }
 

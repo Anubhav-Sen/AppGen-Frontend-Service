@@ -52,22 +52,35 @@ export default function SchemaBuilder() {
         .then((project) => {
           loadProject(project);
 
-          const spec = project.schema_data as unknown as FastAPIProjectSpec;
+          const spec = project.schema_data as unknown as FastAPIProjectSpec & {
+            _ui_metadata?: {
+              models: Array<{ name: string; position: { x: number; y: number } }>;
+              enums: Array<{ name: string; position: { x: number; y: number } }>;
+            };
+          };
           if (spec) {
             if (spec.project) loadConfig(spec.project, spec.git, spec.database, spec.security, spec.token);
 
             if (spec.schema) {
-              const modelsWithUI: ModelWithUI[] = spec.schema.models.map((model) => ({
-                ...model,
-                id: nanoid(),
-                position: (model as any).position || { x: 100, y: 100 },
-              }));
+              const uiMetadata = spec._ui_metadata;
 
-              const enumsWithUI: EnumWithUI[] = (spec.schema.enums || []).map((enumDef) => ({
-                ...enumDef,
-                id: nanoid(),
-                position: (enumDef as any).position || { x: 100, y: 100 },
-              }));
+              const modelsWithUI: ModelWithUI[] = spec.schema.models.map((model) => {
+                const savedPosition = uiMetadata?.models.find((m) => m.name === model.name)?.position;
+                return {
+                  ...model,
+                  id: nanoid(),
+                  position: savedPosition || { x: 100, y: 100 },
+                };
+              });
+
+              const enumsWithUI: EnumWithUI[] = (spec.schema.enums || []).map((enumDef) => {
+                const savedPosition = uiMetadata?.enums.find((e) => e.name === enumDef.name)?.position;
+                return {
+                  ...enumDef,
+                  id: nanoid(),
+                  position: savedPosition || { x: 100, y: 100 },
+                };
+              });
 
               loadSchema(modelsWithUI, enumsWithUI, spec.schema.association_tables || []);
             }
