@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   ReactFlow,
   Background,
@@ -13,6 +14,8 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useSchemaStore } from "@/stores/schemaStore";
+import { useProjectStore } from "@/stores/projectStore";
+import { schemas } from "@/api/schemas";
 import ModelNode from "@/components/schema/nodes/ModelNode";
 import EnumNode from "@/components/schema/nodes/EnumNode";
 import { modelsToNodes, enumsToNodes, relationshipsToEdges } from "@/lib/utils/flowConverter";
@@ -26,12 +29,32 @@ const nodeTypes = {
 } as NodeTypes;
 
 export default function SchemaBuilder() {
+  const [searchParams] = useSearchParams();
   const models = useSchemaStore((state) => state.models);
   const enums = useSchemaStore((state) => state.enums);
   const updateModelPosition = useSchemaStore((state) => state.updateModelPosition);
   const updateEnumPosition = useSchemaStore((state) => state.updateEnumPosition);
+  const { loadProject } = useProjectStore();
 
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const projectId = searchParams.get("projectId");
+    if (projectId) {
+      setIsLoading(true);
+      schemas.getById(Number(projectId))
+        .then((project) => {
+          loadProject(project);
+        })
+        .catch((error) => {
+          console.error("Failed to load project:", error);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [searchParams, loadProject]);
 
   const initialNodes = useMemo(() => {
     return [...modelsToNodes(models), ...enumsToNodes(enums)];
@@ -77,6 +100,17 @@ export default function SchemaBuilder() {
   const onPaneClick = useCallback(() => {
     setSelectedNode(null);
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center bg-secondary-50">
+        <div className="text-center">
+          <div className="text-lg text-secondary-700 mb-2">Loading project...</div>
+          <div className="text-sm text-secondary-500">Please wait</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full h-screen relative flex">
