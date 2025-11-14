@@ -22,6 +22,7 @@ interface ConfigState {
   setSecurity: (config: Partial<SecurityConfig>) => void;
   setToken: (config: Partial<TokenConfig>) => void;
 
+  loadConfig: (project: ProjectConfig, git: GitConfig, database: DatabaseConfig, security: SecurityConfig, token: TokenConfig) => void;
   resetToDefaults: () => void;
 }
 
@@ -93,6 +94,16 @@ export const useConfigStore = create<ConfigState>()(
     set((state) => ({
       token: { ...state.token, ...config },
     }));
+  },
+
+  loadConfig: (project, git, database, security, token) => {
+    set({
+      project,
+      git,
+      database,
+      security,
+      token,
+    });
   },
 
   resetToDefaults: () => {

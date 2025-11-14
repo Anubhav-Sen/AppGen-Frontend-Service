@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { schemas } from "@/api/schemas";
 import { Alert } from "@/components/ui/Alert";
 import { getErrorMessage } from "@/lib/utils/error";
@@ -8,10 +8,26 @@ import type { SchemaProject } from "@/types/schema";
 
 const ProjectsListPage: React.FC = () => {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const [deleteError, setDeleteError] = useState<string | null>(null);
+    const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
 
     const { data: projects, isLoading, error } = useQuery({
         queryKey: ["schemas"],
         queryFn: schemas.getAll,
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: (id: number) => schemas.delete(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["schemas"] });
+            setDeleteSuccess("Project deleted successfully");
+            setTimeout(() => setDeleteSuccess(null), 3000);
+        },
+        onError: (error) => {
+            setDeleteError(getErrorMessage(error, "Failed to delete project"));
+            setTimeout(() => setDeleteError(null), 5000);
+        },
     });
 
     const handleCreateNew = () => {
@@ -20,6 +36,13 @@ const ProjectsListPage: React.FC = () => {
 
     const handleProjectClick = (project: SchemaProject) => {
         navigate(`/builder?projectId=${project.id}`);
+    };
+
+    const handleDeleteProject = (e: React.MouseEvent, projectId: number) => {
+        e.stopPropagation();
+        if (window.confirm("Are you sure you want to delete this project? This action cannot be undone.")) {
+            deleteMutation.mutate(projectId);
+        }
     };
 
     const formatDate = (dateString: string) => {
@@ -59,6 +82,14 @@ const ProjectsListPage: React.FC = () => {
                     </Alert>
                 )}
 
+                {deleteError && (
+                    <Alert type="error">{deleteError}</Alert>
+                )}
+
+                {deleteSuccess && (
+                    <Alert type="success">{deleteSuccess}</Alert>
+                )}
+
                 {isLoading && (
                     <div className="flex items-center justify-center py-20">
                         <div className="text-secondary-600">Loading projects...</div>
@@ -90,33 +121,46 @@ const ProjectsListPage: React.FC = () => {
                 {!isLoading && !error && projects && projects.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {projects.map((project) => (
-                            <button
+                            <div
                                 key={project.id}
-                                onClick={() => handleProjectClick(project)}
-                                className="bg-white rounded-lg border border-secondary-200 p-6 shadow-sm hover:shadow-md hover:border-primary-300 transition text-left group"
+                                className="bg-white rounded-lg border border-secondary-200 p-6 shadow-sm hover:shadow-md hover:border-primary-300 transition text-left group relative"
                             >
-                                <div className="flex items-start justify-between mb-3">
-                                    <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition">
-                                        <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
-                                        </svg>
+                                <button
+                                    onClick={() => handleProjectClick(project)}
+                                    className="w-full text-left"
+                                >
+                                    <div className="flex items-start justify-between mb-3">
+                                        <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center group-hover:bg-primary-200 transition">
+                                            <svg className="w-6 h-6 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
+                                            </svg>
+                                        </div>
+                                        <button
+                                            onClick={(e) => handleDeleteProject(e, project.id)}
+                                            className="text-secondary-400 hover:text-red-600 transition p-1"
+                                            title="Delete project"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                            </svg>
+                                        </button>
                                     </div>
-                                </div>
-                                <h3 className="text-lg font-semibold text-secondary-900 mb-2 group-hover:text-primary-600 transition">
-                                    {project.name}
-                                </h3>
-                                {project.description && (
-                                    <p className="text-sm text-secondary-600 mb-4 line-clamp-2">
-                                        {project.description}
-                                    </p>
-                                )}
-                                <div className="flex items-center justify-between text-xs text-secondary-500 pt-4 border-t border-secondary-100">
-                                    <span>Created {formatDate(project.created_at)}</span>
-                                    {project.updated_at && (
-                                        <span>Updated {formatDate(project.updated_at)}</span>
+                                    <h3 className="text-lg font-semibold text-secondary-900 mb-2 group-hover:text-primary-600 transition">
+                                        {project.name}
+                                    </h3>
+                                    {project.description && (
+                                        <p className="text-sm text-secondary-600 mb-4 line-clamp-2">
+                                            {project.description}
+                                        </p>
                                     )}
-                                </div>
-                            </button>
+                                    <div className="flex items-center justify-between text-xs text-secondary-500 pt-4 border-t border-secondary-100">
+                                        <span>Created {formatDate(project.created_at)}</span>
+                                        {project.updated_at && (
+                                            <span>Updated {formatDate(project.updated_at)}</span>
+                                        )}
+                                    </div>
+                                </button>
+                            </div>
                         ))}
                     </div>
                 )}

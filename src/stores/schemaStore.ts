@@ -39,6 +39,7 @@ interface SchemaState {
   updateModelPosition: (id: string, position: { x: number; y: number }) => void;
   updateEnumPosition: (id: string, position: { x: number; y: number }) => void;
 
+  loadSchema: (models: ModelWithUI[], enums: EnumWithUI[], associationTables: AssociationTable[]) => void;
   clearAll: () => void;
 }
 
@@ -218,6 +219,14 @@ export const useSchemaStore = create<SchemaState>()(
     set((state) => ({
       enums: state.enums.map((e) => (e.id === id ? { ...e, position } : e)),
     }));
+  },
+
+  loadSchema: (models, enums, associationTables) => {
+    set({
+      models,
+      enums,
+      associationTables,
+    });
   },
 
   clearAll: () => {

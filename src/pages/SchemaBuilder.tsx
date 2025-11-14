@@ -15,7 +15,10 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useSchemaStore } from "@/stores/schemaStore";
 import { useProjectStore } from "@/stores/projectStore";
+import { useConfigStore } from "@/stores/configStore";
 import { schemas } from "@/api/schemas";
+import type { FastAPIProjectSpec, ModelWithUI, EnumWithUI } from "@/types/fastapiSpec";
+import { nanoid } from "nanoid";
 import ModelNode from "@/components/schema/nodes/ModelNode";
 import EnumNode from "@/components/schema/nodes/EnumNode";
 import { modelsToNodes, enumsToNodes, relationshipsToEdges } from "@/lib/utils/flowConverter";
@@ -34,7 +37,9 @@ export default function SchemaBuilder() {
   const enums = useSchemaStore((state) => state.enums);
   const updateModelPosition = useSchemaStore((state) => state.updateModelPosition);
   const updateEnumPosition = useSchemaStore((state) => state.updateEnumPosition);
+  const loadSchema = useSchemaStore((state) => state.loadSchema);
   const { loadProject } = useProjectStore();
+  const { loadConfig } = useConfigStore();
 
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +51,27 @@ export default function SchemaBuilder() {
       schemas.getById(Number(projectId))
         .then((project) => {
           loadProject(project);
+
+          const spec = project.schema_data as unknown as FastAPIProjectSpec;
+          if (spec) {
+            if (spec.project) loadConfig(spec.project, spec.git, spec.database, spec.security, spec.token);
+
+            if (spec.schema) {
+              const modelsWithUI: ModelWithUI[] = spec.schema.models.map((model) => ({
+                ...model,
+                id: nanoid(),
+                position: (model as any).position || { x: 100, y: 100 },
+              }));
+
+              const enumsWithUI: EnumWithUI[] = (spec.schema.enums || []).map((enumDef) => ({
+                ...enumDef,
+                id: nanoid(),
+                position: (enumDef as any).position || { x: 100, y: 100 },
+              }));
+
+              loadSchema(modelsWithUI, enumsWithUI, spec.schema.association_tables || []);
+            }
+          }
         })
         .catch((error) => {
           console.error("Failed to load project:", error);
@@ -54,7 +80,7 @@ export default function SchemaBuilder() {
           setIsLoading(false);
         });
     }
-  }, [searchParams, loadProject]);
+  }, [searchParams, loadProject, loadConfig, loadSchema]);
 
   const initialNodes = useMemo(() => {
     return [...modelsToNodes(models), ...enumsToNodes(enums)];

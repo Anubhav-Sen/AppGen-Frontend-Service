@@ -1,6 +1,7 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useNavigate } from "react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { loginSchema, type LoginFormValues } from "@/lib/schemas/auth";
 import { getErrorMessage } from "@/lib/utils/error";
@@ -8,6 +9,7 @@ import { FormInput } from "@/components/ui/FormInput";
 import { Alert } from "@/components/ui/Alert";
 
 const LoginPage: React.FC = () => {
+    const navigate = useNavigate();
     const { login } = useAuth();
     const [serverError, setServerError] = React.useState<string | null>(null);
     const [serverSuccess, setServerSuccess] = React.useState<string | null>(null);
@@ -31,6 +33,7 @@ const LoginPage: React.FC = () => {
             const response = await login(data);
             setServerSuccess(`Welcome back, ${response.user.email}!`);
             reset({ email: data.email, password: "" });
+            setTimeout(() => navigate("/projects"), 500);
         } catch (error: unknown) {
             setServerError(
                 getErrorMessage(
