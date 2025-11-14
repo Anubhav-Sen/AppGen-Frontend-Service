@@ -29,8 +29,25 @@ export default function ConfigPage() {
     navigate("/builder");
   };
 
-  const isProjectConfigValid = () => {
-    return config.project.title.trim().length > 0;
+  const isConfigValid = () => {
+    // Project validation
+    if (!config.project.title.trim()) return false;
+
+    // Database validation
+    if (!config.database.db_name.trim()) return false;
+    if (config.database.db_provider !== "sqlite") {
+      if (!config.database.db_host?.trim()) return false;
+      if (!config.database.db_port) return false;
+    }
+
+    // Security validation
+    if (!config.security.secret_key.trim()) return false;
+
+    // Token validation
+    if (config.token.access_token_expire_minutes <= 0) return false;
+    if (config.token.refresh_token_expire_days <= 0) return false;
+
+    return true;
   };
 
   return (
@@ -80,7 +97,7 @@ export default function ConfigPage() {
               </button>
               <button
                 onClick={handleContinue}
-                disabled={!isProjectConfigValid()}
+                disabled={!isConfigValid()}
                 className="px-6 py-2.5 rounded-lg font-medium bg-primary-500 hover:bg-primary-600 text-white shadow-primary-glow transition focus:outline-none focus:ring-2 focus:ring-primary-500/50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 Continue to Schema Builder
