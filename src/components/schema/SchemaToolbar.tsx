@@ -161,8 +161,15 @@ export default function SchemaToolbar() {
 
           <div className="border-t border-secondary-200 pt-2 mt-2">
             <button
-              onClick={() => setShowPreview(true)}
+              onClick={() => navigate("/config")}
               className="w-full px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors font-medium"
+            >
+              Edit Configuration
+            </button>
+
+            <button
+              onClick={() => setShowPreview(true)}
+              className="w-full px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors font-medium mt-2"
             >
               Preview JSON
             </button>
