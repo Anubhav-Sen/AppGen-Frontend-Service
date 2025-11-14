@@ -1,4 +1,18 @@
+import { useNavigate } from "react-router";
+import { useAuthStore } from "@/stores/authStore";
+
 export default function HomePage() {
+    const navigate = useNavigate();
+    const user = useAuthStore((s) => s.user);
+
+    const handleGetStarted = () => {
+        if (user) {
+            navigate("/projects");
+        } else {
+            navigate("/login");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-secondary-50">
             <div className="max-w-5xl mx-auto px-6 py-12">
@@ -55,7 +69,10 @@ export default function HomePage() {
                             <p className="text-secondary-700">Deploy and start building your application</p>
                         </div>
                     </div>
-                    <button className="mt-6 bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-lg font-medium shadow-primary-glow transition focus:outline-none focus:ring-2 focus:ring-primary-500/50">
+                    <button
+                        onClick={handleGetStarted}
+                        className="mt-6 bg-primary-500 hover:bg-primary-600 text-white px-6 py-2.5 rounded-lg font-medium shadow-primary-glow transition focus:outline-none focus:ring-2 focus:ring-primary-500/50"
+                    >
                         Get Started
                     </button>
                 </div>
