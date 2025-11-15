@@ -12,17 +12,17 @@ export default function ProjectConfigForm() {
     <div className="space-y-6">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
-          Project Title
+          Project Title <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={projectConfig.title}
           onChange={(e) => handleChange("title", e.target.value)}
-          placeholder="My FastAPI Project"
+          placeholder="e.g., E-Commerce API"
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <p className="mt-1 text-sm text-gray-500">
-          The title of your FastAPI project
+          A descriptive name for your FastAPI project
         </p>
       </div>
 
@@ -34,9 +34,12 @@ export default function ProjectConfigForm() {
           type="text"
           value={projectConfig.author || ""}
           onChange={(e) => handleChange("author", e.target.value)}
-          placeholder="Your Name"
+          placeholder="e.g., John Doe"
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <p className="mt-1 text-sm text-gray-500">
+          Your name or organization
+        </p>
       </div>
 
       <div>
@@ -46,10 +49,13 @@ export default function ProjectConfigForm() {
         <textarea
           value={projectConfig.description || ""}
           onChange={(e) => handleChange("description", e.target.value)}
-          placeholder="A FastAPI project with auto-generated CRUD operations"
+          placeholder="e.g., A RESTful API for managing products, orders, and customers"
           rows={3}
           className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
+        <p className="mt-1 text-sm text-gray-500">
+          Brief description of what your API does
+        </p>
       </div>
     </div>
   );

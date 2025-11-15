@@ -27,7 +27,7 @@ interface ConfigState {
 }
 
 const defaultProject: ProjectConfig = {
-  title: "My FastAPI Project",
+  title: "",
   author: "",
   description: "",
 };
@@ -40,8 +40,8 @@ const defaultGit: GitConfig = {
 
 const defaultDatabase: DatabaseConfig = {
   db_provider: DBProvider.POSTGRESQL,
-  db_name: "myapp",
-  db_host: "localhost",
+  db_name: "",
+  db_host: "",
   db_port: 5432,
   db_username: "",
   db_password: "",

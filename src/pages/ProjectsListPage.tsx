@@ -4,11 +4,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { schemas } from "@/api/schemas";
 import { Alert } from "@/components/ui/Alert";
 import { getErrorMessage } from "@/lib/utils/error";
+import { useConfigStore } from "@/stores/configStore";
+import { useSchemaStore } from "@/stores/schemaStore";
+import { useProjectStore } from "@/stores/projectStore";
 import type { SchemaProject } from "@/types/schema";
 
 const ProjectsListPage: React.FC = () => {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const resetConfig = useConfigStore((state) => state.resetToDefaults);
+    const clearSchema = useSchemaStore((state) => state.clearAll);
+    const { clearProject } = useProjectStore();
     const [deleteError, setDeleteError] = useState<string | null>(null);
     const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
 
@@ -31,6 +37,10 @@ const ProjectsListPage: React.FC = () => {
     });
 
     const handleCreateNew = () => {
+        // Reset all stores when creating a new project
+        resetConfig();
+        clearSchema();
+        clearProject();
         navigate("/config");
     };
 
