@@ -8,14 +8,14 @@ function EnumNode({ data, selected }: NodeProps) {
 
   return (
     <div
-      className={`bg-white border-2 rounded-lg shadow-md min-w-[180px] ${
-        selected ? "border-purple-500" : "border-gray-300"
+      className={`bg-white border-2 rounded-lg shadow-md min-w-[180px] overflow-hidden ${
+        selected ? "border-purple-500" : "border-secondary-300"
       }`}
     >
       <Handle type="target" position={Position.Top} className="w-3 h-3" />
 
-      <div className="bg-purple-50 px-4 py-2 border-b border-gray-200">
-        <div className="font-semibold text-gray-800 flex items-center gap-2">
+      <div className="bg-purple-50 px-4 py-2 border-b border-secondary-200">
+        <div className="font-semibold text-secondary-800 flex items-center gap-2">
           <span className="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded">
             ENUM
           </span>
