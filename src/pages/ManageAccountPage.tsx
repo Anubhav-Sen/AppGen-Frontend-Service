@@ -10,7 +10,6 @@ import { Alert } from "@/components/ui/Alert";
 
 const updateProfileSchema = z.object({
     username: z.string().min(3, "Username must be at least 3 characters").max(30, "Username must not exceed 30 characters"),
-    email: z.string().email("Please enter a valid email address"),
 });
 
 const changePasswordSchema = z.object({
@@ -40,7 +39,6 @@ export default function ManageAccountPage() {
         resolver: zodResolver(updateProfileSchema),
         defaultValues: {
             username: user?.username || "",
-            email: user?.email || "",
         },
     });
 
@@ -60,7 +58,6 @@ export default function ManageAccountPage() {
         try {
             const updatedUser = await updateUser({
                 username: data.username,
-                email: data.email,
             });
             setUser(updatedUser);
             setProfileSuccess("Profile updated successfully!");
@@ -110,13 +107,16 @@ export default function ManageAccountPage() {
                                 {...registerProfile("username")}
                             />
 
-                            <FormInput
-                                label="Email"
-                                type="email"
-                                autoComplete="email"
-                                error={profileErrors.email}
-                                {...registerProfile("email")}
-                            />
+                            <div>
+                                <label className="block text-sm font-medium text-secondary-700 mb-1">Email</label>
+                                <input
+                                    type="email"
+                                    value={user?.email || ""}
+                                    disabled
+                                    className="w-full rounded-lg border border-secondary-300 bg-secondary-100 px-4 py-2.5 text-secondary-500 cursor-not-allowed"
+                                />
+                                <p className="mt-1 text-xs text-secondary-500">Email cannot be changed as it is used for login</p>
+                            </div>
 
                             <div className="pt-2">
                                 <button
@@ -178,10 +178,6 @@ export default function ManageAccountPage() {
                     <div className="bg-white rounded-lg shadow-lg border border-secondary-200 p-6">
                         <h2 className="text-xl font-semibold text-secondary-900 mb-4">Account Information</h2>
                         <div className="space-y-3 text-sm">
-                            <div className="flex justify-between py-2 border-b border-secondary-100">
-                                <span className="text-secondary-600">User ID</span>
-                                <span className="text-secondary-900 font-medium">{user?.id}</span>
-                            </div>
                             <div className="flex justify-between py-2 border-b border-secondary-100">
                                 <span className="text-secondary-600">Account Status</span>
                                 <span className={`font-medium ${user?.isActive ? "text-green-600" : "text-red-600"}`}>

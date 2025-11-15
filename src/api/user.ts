@@ -3,7 +3,6 @@ import type { User } from "@/types/user";
 
 export interface UpdateUserPayload {
     username?: string;
-    email?: string;
 }
 
 export interface ChangePasswordPayload {
