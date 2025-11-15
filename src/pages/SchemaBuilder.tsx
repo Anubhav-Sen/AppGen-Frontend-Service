@@ -7,8 +7,6 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
-  type Connection,
   type NodeTypes,
   type Node,
 } from "@xyflow/react";
@@ -114,12 +112,8 @@ export default function SchemaBuilder() {
     setEdges(initialEdges as any);
   }, [initialEdges, setEdges]);
 
-  const onConnect = useCallback(
-    (connection: Connection) => {
-      setEdges((eds) => addEdge(connection, eds));
-    },
-    [setEdges]
-  );
+  // Connections are disabled - relationships are created via the editors
+  // This prevents drag-and-drop connections in React Flow
 
   const onNodeDragStop = useCallback(
     (_event: React.MouseEvent, node: any) => {
@@ -160,11 +154,12 @@ export default function SchemaBuilder() {
           edges={edges}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
           onNodeDragStop={onNodeDragStop}
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
           nodeTypes={nodeTypes}
+          connectOnClick={false}
+          nodesConnectable={false}
           fitView
         >
           <Background />
