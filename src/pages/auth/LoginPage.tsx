@@ -13,6 +13,7 @@ const LoginPage: React.FC = () => {
     const { login } = useAuth();
     const [serverError, setServerError] = React.useState<string | null>(null);
     const [serverSuccess, setServerSuccess] = React.useState<string | null>(null);
+    const [staySignedIn, setStaySignedIn] = React.useState<boolean>(false);
 
     const {
         register,
@@ -30,7 +31,7 @@ const LoginPage: React.FC = () => {
         setServerSuccess(null);
 
         try {
-            const response = await login(data);
+            const response = await login(data, staySignedIn);
             setServerSuccess(`Welcome back, ${response.user.email}!`);
             reset({ email: data.email, password: "" });
             setTimeout(() => navigate("/projects"), 500);
@@ -73,6 +74,19 @@ const LoginPage: React.FC = () => {
                         error={errors.password}
                         {...register("password")}
                     />
+
+                    <div className="flex items-center">
+                        <input
+                            id="stay-signed-in"
+                            type="checkbox"
+                            checked={staySignedIn}
+                            onChange={(e) => setStaySignedIn(e.target.checked)}
+                            className="h-4 w-4 rounded border-secondary-300 text-primary-600 focus:ring-primary-500"
+                        />
+                        <label htmlFor="stay-signed-in" className="ml-2 text-sm text-secondary-600">
+                            Stay signed in
+                        </label>
+                    </div>
 
                     <button
                         type="submit"

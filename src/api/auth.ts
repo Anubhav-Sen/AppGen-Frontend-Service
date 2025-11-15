@@ -37,10 +37,11 @@ interface UserRaw {
 }
 
 export const auth = {
-    async login(payload: LoginPayload): Promise<LoginResponse> {
+    async login(payload: LoginPayload, rememberMe: boolean = false): Promise<LoginResponse> {
         const response = await api.post<LoginResponseRaw>("/auth/login", {
             email: payload.email,
             password: payload.password,
+            remember_me: rememberMe,
         });
         return {
             accessToken: response.data.access_token,
