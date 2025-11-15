@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { Relationship, ModelWithUI } from "@/types/fastapiSpec";
+import type { Relationship, ModelWithUI, CascadeOption } from "@/types/fastapiSpec";
+import { CascadeOption as CascadeOptions } from "@/types/fastapiSpec";
 
 interface RelationshipEditorProps {
   relationship?: Relationship;
@@ -7,6 +8,16 @@ interface RelationshipEditorProps {
   onSave: (relationship: Relationship) => void;
   onCancel: () => void;
 }
+
+const cascadeOptionLabels: Record<CascadeOption, string> = {
+  [CascadeOptions.SAVE_UPDATE]: "Save/Update",
+  [CascadeOptions.MERGE]: "Merge",
+  [CascadeOptions.EXPUNGE]: "Expunge",
+  [CascadeOptions.DELETE]: "Delete",
+  [CascadeOptions.DELETE_ORPHAN]: "Delete Orphan",
+  [CascadeOptions.REFRESH_EXPIRE]: "Refresh/Expire",
+  [CascadeOptions.ALL]: "All",
+};
 
 export default function RelationshipEditor({
   relationship,
@@ -18,6 +29,15 @@ export default function RelationshipEditor({
   const [target, setTarget] = useState(relationship?.target || "");
   const [backPopulates, setBackPopulates] = useState(relationship?.back_populates || "");
   const [uselist, setUselist] = useState(relationship?.uselist);
+  const [cascade, setCascade] = useState<CascadeOption[]>(relationship?.cascade || []);
+
+  const handleCascadeToggle = (option: CascadeOption) => {
+    setCascade((prev) =>
+      prev.includes(option)
+        ? prev.filter((o) => o !== option)
+        : [...prev, option]
+    );
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +49,7 @@ export default function RelationshipEditor({
 
     if (backPopulates) newRelationship.back_populates = backPopulates;
     if (uselist !== undefined) newRelationship.uselist = uselist;
+    if (cascade.length > 0) newRelationship.cascade = cascade;
 
     onSave(newRelationship);
   };
@@ -83,6 +104,24 @@ export default function RelationshipEditor({
           />
           Use List (one-to-many)
         </label>
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-gray-700 mb-1">Cascade Options</label>
+        <div className="grid grid-cols-2 gap-1">
+          {Object.entries(cascadeOptionLabels).map(([option, label]) => (
+            <label key={option} className="flex items-center gap-1 text-xs">
+              <input
+                type="checkbox"
+                checked={cascade.includes(option as CascadeOption)}
+                onChange={() => handleCascadeToggle(option as CascadeOption)}
+                className="rounded text-purple-600"
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+        <p className="mt-1 text-xs text-gray-500">Select cascade behaviors for related objects</p>
       </div>
 
       <div className="flex gap-2">
