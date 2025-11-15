@@ -138,73 +138,116 @@ export default function SchemaToolbar() {
 
   return (
     <>
-      <div className="absolute top-4 left-4 z-10 bg-white p-4 rounded-lg shadow-lg border border-secondary-200 space-y-2 max-w-xs">
-        <h2 className="text-lg font-semibold mb-3 text-secondary-900">Schema Builder</h2>
+      <div className="absolute top-4 left-4 z-10 bg-white p-3 rounded-lg shadow-lg border border-secondary-200 space-y-1.5 w-52">
+        <h2 className="text-sm font-semibold mb-2 text-secondary-900 flex items-center gap-2">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+          </svg>
+          Schema Builder
+        </h2>
 
         {saveError && <Alert type="error">{saveError}</Alert>}
         {saveSuccess && <Alert type="success">{saveSuccess}</Alert>}
 
-        <div className="space-y-2">
-          <button
-            onClick={handleAddModel}
-            className="w-full px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium shadow-sm"
-          >
-            + Add Model
-          </button>
-
-          <button
-            onClick={handleAddEnum}
-            className="w-full px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors font-medium shadow-sm"
-          >
-            + Add Enum
-          </button>
-
-          <div className="border-t border-secondary-200 pt-2 mt-2">
+        <div className="space-y-1.5">
+          <div className="flex gap-1.5">
             <button
-              onClick={() => navigate("/config")}
-              className="w-full px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors font-medium"
+              onClick={handleAddModel}
+              className="flex-1 px-2 py-1.5 bg-primary-500 text-white rounded text-xs hover:bg-primary-600 transition-colors font-medium flex items-center justify-center gap-1"
+              title="Add a new model"
             >
-              Edit Configuration
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Model
             </button>
 
             <button
-              onClick={() => setShowPreview(true)}
-              className="w-full px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors font-medium mt-2"
+              onClick={handleAddEnum}
+              className="flex-1 px-2 py-1.5 bg-purple-500 text-white rounded text-xs hover:bg-purple-600 transition-colors font-medium flex items-center justify-center gap-1"
+              title="Add a new enum"
             >
-              Preview JSON
-            </button>
-
-            <button
-              onClick={handleExportJSON}
-              className="w-full px-4 py-2 bg-secondary-100 text-secondary-700 rounded-lg hover:bg-secondary-200 transition-colors font-medium mt-2"
-            >
-              Export JSON
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Enum
             </button>
           </div>
 
-          <div className="border-t border-secondary-200 pt-2 mt-2">
+          <div className="border-t border-secondary-200 pt-1.5 mt-1.5 space-y-1">
+            <button
+              onClick={() => navigate("/config")}
+              className="w-full px-2 py-1.5 bg-secondary-100 text-secondary-700 rounded text-xs hover:bg-secondary-200 transition-colors font-medium flex items-center gap-2"
+              title="Edit project configuration"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Configuration
+            </button>
+
+            <div className="flex gap-1">
+              <button
+                onClick={() => setShowPreview(true)}
+                className="flex-1 px-2 py-1.5 bg-secondary-100 text-secondary-700 rounded text-xs hover:bg-secondary-200 transition-colors font-medium flex items-center justify-center gap-1"
+                title="Preview JSON output"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+                Preview
+              </button>
+
+              <button
+                onClick={handleExportJSON}
+                className="flex-1 px-2 py-1.5 bg-secondary-100 text-secondary-700 rounded text-xs hover:bg-secondary-200 transition-colors font-medium flex items-center justify-center gap-1"
+                title="Export as JSON file"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export
+              </button>
+            </div>
+          </div>
+
+          <div className="border-t border-secondary-200 pt-1.5 mt-1.5 space-y-1">
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-2 py-1.5 bg-green-500 text-white rounded text-xs hover:bg-green-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+              title="Save project"
             >
-              {isSaving ? "Saving..." : isEditMode ? "Save Changes" : "Save Project"}
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              </svg>
+              {isSaving ? "Saving..." : isEditMode ? "Save" : "Save Project"}
             </button>
 
             <button
               onClick={handleSaveAndExit}
               disabled={isSaving}
-              className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium shadow-sm mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-2 py-1.5 bg-primary-500 text-white rounded text-xs hover:bg-primary-600 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1"
+              title="Save and return to projects"
             >
-              {isSaving ? "Saving..." : "Save & Go to Projects"}
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              {isSaving ? "Saving..." : "Save & Exit"}
             </button>
           </div>
 
-          <div className="border-t border-secondary-200 pt-2 mt-2">
+          <div className="border-t border-secondary-200 pt-1.5 mt-1.5">
             <button
               onClick={handleClearAll}
-              className="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium shadow-sm"
+              className="w-full px-2 py-1.5 bg-red-100 text-red-600 rounded text-xs hover:bg-red-200 transition-colors font-medium flex items-center justify-center gap-1"
+              title="Clear all models and enums"
             >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
               Clear All
             </button>
           </div>
