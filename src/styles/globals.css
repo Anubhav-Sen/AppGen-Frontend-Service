@@ -2,10 +2,10 @@ html, body, #root {
     height: 100%;
     margin: 0;
     font-family: Inter, system-ui, -apple-system, sans-serif;
-    background-color: #ffffff;
+    background-color: #f8fafc;
 }
 
-/* Scrollbar only appears when content overflows */
+/* Scrollbar styling - only appears when content overflows */
 * {
     scrollbar-width: thin;
     scrollbar-color: #9ca3af transparent;
@@ -29,9 +29,18 @@ html, body, #root {
     background-color: #6b7280;
 }
 
-/* Hide scrollbar when not needed */
-html, body {
-    overflow-x: hidden;
-    overflow-y: auto;
+/* Prevent body scroll - pages manage their own scrolling */
+html {
+    overflow: hidden;
+}
+
+body {
+    overflow: hidden;
+    height: 100vh;
+}
+
+#root {
+    height: 100vh;
+    overflow: hidden;
 }
 
