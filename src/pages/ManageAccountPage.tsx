@@ -85,7 +85,7 @@ export default function ManageAccountPage() {
     };
 
     return (
-        <div className="min-h-screen bg-secondary-50 py-8">
+        <div className="h-full bg-secondary-50 py-8">
             <div className="max-w-3xl mx-auto px-4">
                 <h1 className="text-3xl font-bold text-secondary-900 mb-2">Account Settings</h1>
                 <p className="text-secondary-600 mb-8">Manage your account information and security</p>

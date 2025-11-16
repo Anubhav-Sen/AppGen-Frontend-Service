@@ -8,9 +8,11 @@ type Props = {
 
 export default function ProtectedRoute({ children }: Props) {
     const accessToken = useAuthStore((s) => s.accessToken);
+    const user = useAuthStore((s) => s.user);
     const location = useLocation();
 
-    if (!accessToken) {
+    // Require both token and user for authenticated access
+    if (!accessToken || !user) {
         return <Navigate to="/login" replace state={{ from: location }} />;
     }
 

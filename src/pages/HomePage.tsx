@@ -14,7 +14,7 @@ export default function HomePage() {
     };
 
     return (
-        <div className="min-h-screen bg-secondary-50">
+        <div className="h-full bg-secondary-50">
             <div className="max-w-5xl mx-auto px-6 py-12">
                 <h1 className="text-4xl font-bold text-secondary-900 mb-3">Welcome to AppGen Frontend</h1>
                 <p className="text-lg text-secondary-600 mb-8">

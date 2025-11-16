@@ -8,8 +8,10 @@ type Props = {
 
 export default function PublicRoute({ children }: Props) {
     const accessToken = useAuthStore((s) => s.accessToken);
+    const user = useAuthStore((s) => s.user);
 
-    if (accessToken) {
+    // Only redirect if both token and user exist (valid session)
+    if (accessToken && user) {
         return <Navigate to="/projects" replace />;
     }
 

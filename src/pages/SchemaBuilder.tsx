@@ -136,7 +136,7 @@ export default function SchemaBuilder() {
 
   if (isLoading) {
     return (
-      <div className="w-full h-screen flex items-center justify-center bg-secondary-50">
+      <div className="w-full h-full flex items-center justify-center bg-secondary-50">
         <div className="text-center">
           <div className="text-lg text-secondary-700 mb-2">Loading project...</div>
           <div className="text-sm text-secondary-500">Please wait</div>
@@ -146,7 +146,7 @@ export default function SchemaBuilder() {
   }
 
   return (
-    <div className="w-full h-screen relative flex">
+    <div className="w-full h-full relative flex overflow-hidden">
       <div className="flex-1 relative">
         <SchemaToolbar />
         <ReactFlow

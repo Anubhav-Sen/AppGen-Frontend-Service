@@ -15,10 +15,12 @@ const queryClient = new QueryClient();
 
 function Layout() {
   return (
-    <>
+    <div className="h-screen flex flex-col overflow-hidden">
       <Navbar />
-      <Outlet />
-    </>
+      <main className="flex-1 overflow-auto">
+        <Outlet />
+      </main>
+    </div>
   );
 }
 

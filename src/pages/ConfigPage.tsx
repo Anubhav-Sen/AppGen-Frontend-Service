@@ -51,7 +51,7 @@ export default function ConfigPage() {
   };
 
   return (
-    <div className="min-h-screen bg-secondary-50">
+    <div className="h-full bg-secondary-50">
       <div className="max-w-4xl mx-auto py-8 px-4">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-secondary-900 mb-2">Project Configuration</h1>
