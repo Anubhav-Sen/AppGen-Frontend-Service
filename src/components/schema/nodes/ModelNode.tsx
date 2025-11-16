@@ -8,8 +8,8 @@ function ModelNode({ data, selected }: NodeProps) {
 
   return (
     <div
-      className={`bg-white border-2 rounded-lg shadow-md min-w-[200px] overflow-hidden ${
-        selected ? "border-primary-500" : "border-secondary-300"
+      className={`bg-white border-2 rounded-lg min-w-[200px] overflow-hidden transition-shadow ${
+        selected ? "border-primary-500 shadow-lg shadow-primary-100" : "border-secondary-300 shadow-md hover:shadow-lg"
       }`}
     >
       <Handle type="target" position={Position.Top} className="w-3 h-3" />

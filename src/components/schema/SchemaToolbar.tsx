@@ -138,7 +138,7 @@ export default function SchemaToolbar() {
 
   return (
     <>
-      <div className="absolute top-4 left-4 z-10 bg-white p-3 rounded-lg shadow-lg border border-secondary-200 space-y-1.5 w-52">
+      <div className="absolute top-4 left-4 z-10 bg-white p-3 rounded-lg shadow-xl border border-secondary-300 space-y-1.5 w-52">
         <h2 className="text-sm font-semibold mb-2 text-secondary-900 flex items-center gap-2">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />

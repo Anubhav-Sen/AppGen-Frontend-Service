@@ -39,11 +39,13 @@ export default function EnumEditor({ enumId, onClose }: EnumEditorProps) {
   };
 
   return (
-    <div className="w-96 h-full bg-white border-l border-gray-200 overflow-y-auto">
-      <div className="sticky top-0 bg-white border-b border-gray-200 p-4 flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Edit Enum</h2>
-        <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-          ✕
+    <div className="w-96 h-full bg-white border-l-2 border-secondary-300 overflow-y-auto shadow-xl">
+      <div className="sticky top-0 bg-white border-b border-secondary-300 p-4 flex justify-between items-center shadow-sm">
+        <h2 className="text-lg font-semibold text-secondary-900">Edit Enum</h2>
+        <button onClick={onClose} className="text-secondary-400 hover:text-secondary-600 transition-colors">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
         </button>
       </div>
 
@@ -82,12 +84,12 @@ export default function EnumEditor({ enumId, onClose }: EnumEditorProps) {
             {enumDef.values.map((value, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-2 bg-purple-50 rounded border border-purple-200"
+                className="flex items-center justify-between p-2 bg-purple-50 rounded-lg border border-purple-300 shadow-sm"
               >
-                <span className="font-medium text-sm">{value}</span>
+                <span className="font-medium text-sm text-secondary-800">{value}</span>
                 <button
                   onClick={() => handleDeleteValue(index)}
-                  className="text-xs px-2 py-1 text-red-600 hover:bg-red-50 rounded"
+                  className="text-xs px-2 py-1 text-red-600 hover:bg-red-100 rounded transition-colors"
                 >
                   Delete
                 </button>
@@ -96,11 +98,14 @@ export default function EnumEditor({ enumId, onClose }: EnumEditorProps) {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-gray-200">
+        <div className="pt-4 border-t border-secondary-200">
           <button
             onClick={handleDelete}
-            className="w-full px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="w-full px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors font-medium flex items-center justify-center gap-2"
           >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
             Delete Enum
           </button>
         </div>

@@ -1,11 +1,20 @@
-import { useState } from "react";
-import type { Relationship, ModelWithUI, CascadeOption } from "@/types/fastapiSpec";
+import { useState, useEffect } from "react";
+import type { Relationship, ModelWithUI, CascadeOption, Column } from "@/types/fastapiSpec";
 import { CascadeOption as CascadeOptions } from "@/types/fastapiSpec";
+
+export interface RelationshipWithFK {
+  relationship: Relationship;
+  fkColumn?: Column;
+  fkTargetModelId?: string; // Which model should receive the FK column
+}
 
 interface RelationshipEditorProps {
   relationship?: Relationship;
   models: ModelWithUI[];
-  onSave: (relationship: Relationship) => void;
+  currentModelId?: string;
+  currentModelName?: string;
+  currentTableName?: string;
+  onSave: (result: RelationshipWithFK) => void;
   onCancel: () => void;
 }
 
@@ -19,17 +28,37 @@ const cascadeOptionLabels: Record<CascadeOption, string> = {
   [CascadeOptions.ALL]: "All",
 };
 
+type RelationType = "one-to-one" | "one-to-many" | "many-to-one";
+
 export default function RelationshipEditor({
   relationship,
   models,
+  currentModelId,
+  currentModelName,
+  currentTableName,
   onSave,
   onCancel,
 }: RelationshipEditorProps) {
   const [name, setName] = useState(relationship?.name || "");
   const [target, setTarget] = useState(relationship?.target || "");
   const [backPopulates, setBackPopulates] = useState(relationship?.back_populates || "");
-  const [uselist, setUselist] = useState(relationship?.uselist);
+  const [relationType, setRelationType] = useState<RelationType>(
+    relationship?.uselist === false ? "many-to-one" : relationship?.uselist === true ? "one-to-many" : "one-to-one"
+  );
   const [cascade, setCascade] = useState<CascadeOption[]>(relationship?.cascade || []);
+  const [createForeignKey, setCreateForeignKey] = useState(!relationship); // Only auto-create FK for new relationships
+
+  // Auto-generate relationship name based on target and type
+  useEffect(() => {
+    if (target && !relationship) {
+      const targetLower = target.toLowerCase();
+      if (relationType === "one-to-many") {
+        setName(targetLower + "s");
+      } else {
+        setName(targetLower);
+      }
+    }
+  }, [target, relationType, relationship]);
 
   const handleCascadeToggle = (option: CascadeOption) => {
     setCascade((prev) =>
@@ -42,29 +71,78 @@ export default function RelationshipEditor({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    const targetModel = models.find((m) => m.name === target);
     const newRelationship: Relationship = {
       name,
       target,
     };
 
     if (backPopulates) newRelationship.back_populates = backPopulates;
-    if (uselist !== undefined) newRelationship.uselist = uselist;
+    // Set uselist based on relationship type
+    if (relationType === "one-to-many") {
+      newRelationship.uselist = true;
+    } else if (relationType === "many-to-one") {
+      newRelationship.uselist = false;
+    }
     if (cascade.length > 0) newRelationship.cascade = cascade;
 
-    onSave(newRelationship);
+    const result: RelationshipWithFK = { relationship: newRelationship };
+
+    // Auto-create FK column if enabled and this is a new relationship
+    if (createForeignKey && targetModel && !relationship) {
+      // Find the primary key of the referenced model
+      const getPrimaryKeyColumn = (model: ModelWithUI) =>
+        model.columns.find((c) => c.primary_key);
+
+      if (relationType === "many-to-one" || relationType === "one-to-one") {
+        // FK goes on current model, references target's PK
+        const targetPK = getPrimaryKeyColumn(targetModel);
+        if (targetPK) {
+          result.fkColumn = {
+            name: `${target.toLowerCase()}_id`,
+            type: { name: targetPK.type.name },
+            foreign_key: `${targetModel.tablename}.${targetPK.name}`,
+            nullable: true,
+          };
+          result.fkTargetModelId = currentModelId;
+        }
+      } else if (relationType === "one-to-many" && currentTableName) {
+        // FK goes on target model, references current model's PK
+        const currentModel = models.find((m) => m.id === currentModelId);
+        const currentPK = currentModel ? getPrimaryKeyColumn(currentModel) : undefined;
+        if (currentPK) {
+          result.fkColumn = {
+            name: `${currentModelName?.toLowerCase()}_id`,
+            type: { name: currentPK.type.name },
+            foreign_key: `${currentTableName}.${currentPK.name}`,
+            nullable: true,
+          };
+          result.fkTargetModelId = targetModel.id;
+        }
+      }
+    }
+
+    onSave(result);
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-3 bg-purple-50 rounded border border-purple-200 space-y-2">
+    <form onSubmit={handleSubmit} className="p-3 bg-purple-50 rounded-lg border border-purple-300 shadow-sm space-y-2">
       <div>
-        <label className="block text-xs font-medium text-gray-700 mb-1">Relationship Name</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
+        <label className="block text-xs font-medium text-gray-700 mb-1">Relationship Type</label>
+        <select
+          value={relationType}
+          onChange={(e) => setRelationType(e.target.value as RelationType)}
           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
-        />
+        >
+          <option value="one-to-one">One-to-One</option>
+          <option value="one-to-many">One-to-Many (has many)</option>
+          <option value="many-to-one">Many-to-One (belongs to)</option>
+        </select>
+        <p className="mt-0.5 text-xs text-gray-500">
+          {relationType === "one-to-many" && `${currentModelName || "This model"} has many ${target || "targets"}`}
+          {relationType === "many-to-one" && `${currentModelName || "This model"} belongs to one ${target || "target"}`}
+          {relationType === "one-to-one" && `${currentModelName || "This model"} has one ${target || "target"}`}
+        </p>
       </div>
 
       <div>
@@ -85,26 +163,50 @@ export default function RelationshipEditor({
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-gray-700 mb-1">Back Populates</label>
+        <label className="block text-xs font-medium text-gray-700 mb-1">Property Name</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          placeholder={relationType === "one-to-many" ? "e.g., posts" : "e.g., author"}
+          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+        />
+        <p className="mt-0.5 text-xs text-gray-500">Name used to access related object(s)</p>
+      </div>
+
+      <div>
+        <label className="block text-xs font-medium text-gray-700 mb-1">Back Populates (optional)</label>
         <input
           type="text"
           value={backPopulates}
           onChange={(e) => setBackPopulates(e.target.value)}
+          placeholder="Property name on target model"
           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
         />
+        <p className="mt-0.5 text-xs text-gray-500">Creates bidirectional relationship</p>
       </div>
 
-      <div>
-        <label className="flex items-center gap-2 text-xs">
-          <input
-            type="checkbox"
-            checked={uselist || false}
-            onChange={(e) => setUselist(e.target.checked ? true : undefined)}
-            className="rounded"
-          />
-          Use List (one-to-many)
-        </label>
-      </div>
+      {!relationship && (
+        <div className="p-2 bg-blue-50 rounded-lg border border-blue-300 shadow-sm">
+          <label className="flex items-center gap-2 text-xs font-medium text-blue-800">
+            <input
+              type="checkbox"
+              checked={createForeignKey}
+              onChange={(e) => setCreateForeignKey(e.target.checked)}
+              className="rounded text-blue-600"
+            />
+            Auto-create foreign key column
+          </label>
+          {createForeignKey && target && (
+            <p className="mt-1 text-xs text-blue-600">
+              {relationType === "one-to-many"
+                ? `Will add "${currentModelName?.toLowerCase()}_id" column to ${target}`
+                : `Will add "${target.toLowerCase()}_id" column to ${currentModelName}`}
+            </p>
+          )}
+        </div>
+      )}
 
       <div>
         <label className="block text-xs font-medium text-gray-700 mb-1">Cascade Options</label>

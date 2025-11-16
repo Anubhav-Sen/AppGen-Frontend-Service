@@ -6,7 +6,7 @@ export function Navbar() {
     const { user } = useAuthStore();
 
     return (
-        <nav className="flex items-center justify-between bg-white border-b border-secondary-200 px-6 py-4 shadow-sm">
+        <nav className="sticky top-0 z-50 flex items-center justify-between bg-white border-b border-secondary-300 px-6 py-4 shadow-md">
             <Link to="/" className="text-xl font-bold text-secondary-900 hover:text-primary-600 transition-colors">
                 AppGen
             </Link>
