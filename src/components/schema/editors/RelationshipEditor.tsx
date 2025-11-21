@@ -6,6 +6,8 @@ export interface RelationshipWithFK {
   relationship: Relationship;
   fkColumn?: Column;
   fkTargetModelId?: string; // Which model should receive the FK column
+  reverseRelationship?: Relationship; // Bidirectional relationship to add to target model
+  reverseTargetModelId?: string; // Target model ID for reverse relationship
 }
 
 interface RelationshipEditorProps {
@@ -87,6 +89,36 @@ export default function RelationshipEditor({
     if (cascade.length > 0) newRelationship.cascade = cascade;
 
     const result: RelationshipWithFK = { relationship: newRelationship };
+
+    // Auto-create reverse relationship if back_populates is set and this is a new relationship
+    if (backPopulates && targetModel && !relationship) {
+      // Check if the target model already has a relationship with this name
+      const existingReverseRel = targetModel.relationships?.find(
+        (r) => r.name === backPopulates
+      );
+
+      if (!existingReverseRel) {
+        // Determine the reverse relationship type (inverse of current)
+        const reverseUselist = relationType === "one-to-many"
+          ? false  // one-to-many becomes many-to-one (uselist=false)
+          : relationType === "many-to-one"
+            ? true   // many-to-one becomes one-to-many (uselist=true)
+            : undefined; // one-to-one stays one-to-one
+
+        const reverseRelationship: Relationship = {
+          name: backPopulates,
+          target: currentModelName || "",
+          back_populates: name, // Point back to the original relationship
+        };
+
+        if (reverseUselist !== undefined) {
+          reverseRelationship.uselist = reverseUselist;
+        }
+
+        result.reverseRelationship = reverseRelationship;
+        result.reverseTargetModelId = targetModel.id;
+      }
+    }
 
     // Auto-create FK column if enabled and this is a new relationship
     if (createForeignKey && targetModel && !relationship) {
@@ -184,7 +216,11 @@ export default function RelationshipEditor({
           placeholder="Property name on target model"
           className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
         />
-        <p className="mt-0.5 text-xs text-gray-500">Creates bidirectional relationship</p>
+        <p className="mt-0.5 text-xs text-gray-500">
+          {backPopulates && target && !relationship
+            ? `Will auto-create "${backPopulates}" relationship on ${target}`
+            : "Creates bidirectional relationship on target model"}
+        </p>
       </div>
 
       {!relationship && (

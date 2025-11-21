@@ -36,7 +36,8 @@ export function relationshipsToEdges(models: ModelWithUI[]): SchemaEdge[] {
           id: `${model.id}-${rel.name}-${targetModel.id}`,
           source: model.id,
           target: targetModel.id,
-          type: "default",
+          type: "smoothstep",
+          style: { stroke: "#6366f1", strokeWidth: 2 },
           data: {
             relationshipName: rel.name,
             sourceModel: model.name,

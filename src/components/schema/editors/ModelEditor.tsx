@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSchemaStore } from "@/stores/schemaStore";
-import type { ModelWithUI, Column, Relationship, EnumDefinition } from "@/types/fastapiSpec";
+import type { ModelWithUI, Column, EnumDefinition } from "@/types/fastapiSpec";
 import ColumnEditor from "./ColumnEditor";
 import RelationshipEditor, { type RelationshipWithFK } from "./RelationshipEditor";
 
@@ -47,7 +47,7 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
   };
 
   const handleAddRelationship = (result: RelationshipWithFK) => {
-    const { relationship, fkColumn, fkTargetModelId } = result;
+    const { relationship, fkColumn, fkTargetModelId, reverseRelationship, reverseTargetModelId } = result;
 
     // Add the relationship to the current model
     const updatedRelationships = [...(model.relationships || []), relationship];
@@ -63,6 +63,15 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
           const updatedColumns = [...targetModel.columns, fkColumn];
           updateModel(fkTargetModelId, { columns: updatedColumns });
         }
+      }
+    }
+
+    // Add reverse relationship to target model if back_populates was specified
+    if (reverseRelationship && reverseTargetModelId) {
+      const targetModel = models.find((m) => m.id === reverseTargetModelId);
+      if (targetModel) {
+        const updatedTargetRelationships = [...(targetModel.relationships || []), reverseRelationship];
+        updateModel(reverseTargetModelId, { relationships: updatedTargetRelationships });
       }
     }
 
