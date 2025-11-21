@@ -12,7 +12,15 @@ function ModelNode({ data, selected }: NodeProps) {
         selected ? "border-primary-500 shadow-lg shadow-primary-100" : "border-secondary-300 shadow-md hover:shadow-lg"
       }`}
     >
-      <Handle type="target" position={Position.Top} className="w-3 h-3" />
+      {/* Multiple handles on each side for cleaner edge routing */}
+      <Handle type="source" position={Position.Top} id="top" className="w-2 h-2 !bg-indigo-400" />
+      <Handle type="target" position={Position.Top} id="top" className="w-2 h-2 !bg-indigo-400" />
+      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2 !bg-indigo-400" />
+      <Handle type="target" position={Position.Bottom} id="bottom" className="w-2 h-2 !bg-indigo-400" />
+      <Handle type="source" position={Position.Left} id="left" className="w-2 h-2 !bg-indigo-400" />
+      <Handle type="target" position={Position.Left} id="left" className="w-2 h-2 !bg-indigo-400" />
+      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2 !bg-indigo-400" />
+      <Handle type="target" position={Position.Right} id="right" className="w-2 h-2 !bg-indigo-400" />
 
       <div className="bg-primary-50 px-4 py-2 border-b border-secondary-200">
         <div className="font-semibold text-secondary-800">{model.name}</div>
@@ -62,7 +70,6 @@ function ModelNode({ data, selected }: NodeProps) {
         </div>
       )}
 
-      <Handle type="source" position={Position.Bottom} className="w-3 h-3" />
     </div>
   );
 }

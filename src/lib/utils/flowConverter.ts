@@ -25,6 +25,32 @@ export function enumsToNodes(enums: EnumWithUI[]): SchemaNode[] {
   }));
 }
 
+// Determine best handles based on relative positions
+function getBestHandles(
+  sourcePos: { x: number; y: number },
+  targetPos: { x: number; y: number }
+): { sourceHandle: string; targetHandle: string } {
+  const dx = targetPos.x - sourcePos.x;
+  const dy = targetPos.y - sourcePos.y;
+
+  // Determine primary direction
+  if (Math.abs(dx) > Math.abs(dy)) {
+    // Horizontal relationship
+    if (dx > 0) {
+      return { sourceHandle: "right", targetHandle: "left" };
+    } else {
+      return { sourceHandle: "left", targetHandle: "right" };
+    }
+  } else {
+    // Vertical relationship
+    if (dy > 0) {
+      return { sourceHandle: "bottom", targetHandle: "top" };
+    } else {
+      return { sourceHandle: "top", targetHandle: "bottom" };
+    }
+  }
+}
+
 export function relationshipsToEdges(models: ModelWithUI[]): SchemaEdge[] {
   const edges: SchemaEdge[] = [];
 
@@ -32,10 +58,16 @@ export function relationshipsToEdges(models: ModelWithUI[]): SchemaEdge[] {
     model.relationships?.forEach((rel) => {
       const targetModel = models.find((m) => m.name === rel.target);
       if (targetModel) {
+        const sourcePos = model.position || { x: 0, y: 0 };
+        const targetPos = targetModel.position || { x: 0, y: 0 };
+        const { sourceHandle, targetHandle } = getBestHandles(sourcePos, targetPos);
+
         edges.push({
           id: `${model.id}-${rel.name}-${targetModel.id}`,
           source: model.id,
           target: targetModel.id,
+          sourceHandle,
+          targetHandle,
           type: "smoothstep",
           style: { stroke: "#6366f1", strokeWidth: 2 },
           data: {
