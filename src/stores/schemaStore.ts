@@ -14,6 +14,7 @@ interface SchemaState {
   models: ModelWithUI[];
   enums: EnumWithUI[];
   associationTables: AssociationTable[];
+  hasUnsavedChanges: boolean;
 
   addModel: (model: Omit<ModelWithUI, "id">) => string;
   updateModel: (id: string, updates: Partial<ModelWithUI>) => void;
@@ -41,6 +42,7 @@ interface SchemaState {
 
   loadSchema: (models: ModelWithUI[], enums: EnumWithUI[], associationTables: AssociationTable[]) => void;
   clearAll: () => void;
+  markAsSaved: () => void;
 }
 
 export const useSchemaStore = create<SchemaState>()(
@@ -49,6 +51,7 @@ export const useSchemaStore = create<SchemaState>()(
       models: [],
       enums: [],
       associationTables: [],
+      hasUnsavedChanges: false,
 
   addModel: (model) => {
     const id = nanoid();
@@ -59,6 +62,7 @@ export const useSchemaStore = create<SchemaState>()(
     };
     set((state) => ({
       models: [...state.models, newModel],
+      hasUnsavedChanges: true,
     }));
     return id;
   },
@@ -68,12 +72,14 @@ export const useSchemaStore = create<SchemaState>()(
       models: state.models.map((m) =>
         m.id === id ? { ...m, ...updates } : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
   deleteModel: (id) => {
     set((state) => ({
       models: state.models.filter((m) => m.id !== id),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -88,6 +94,7 @@ export const useSchemaStore = create<SchemaState>()(
           ? { ...m, columns: [...m.columns, column] }
           : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -103,6 +110,7 @@ export const useSchemaStore = create<SchemaState>()(
             }
           : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -116,6 +124,7 @@ export const useSchemaStore = create<SchemaState>()(
             }
           : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -129,6 +138,7 @@ export const useSchemaStore = create<SchemaState>()(
             }
           : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -144,6 +154,7 @@ export const useSchemaStore = create<SchemaState>()(
             }
           : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -159,6 +170,7 @@ export const useSchemaStore = create<SchemaState>()(
             }
           : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -171,6 +183,7 @@ export const useSchemaStore = create<SchemaState>()(
     };
     set((state) => ({
       enums: [...state.enums, newEnum],
+      hasUnsavedChanges: true,
     }));
     return id;
   },
@@ -178,18 +191,21 @@ export const useSchemaStore = create<SchemaState>()(
   updateEnum: (id, updates) => {
     set((state) => ({
       enums: state.enums.map((e) => (e.id === id ? { ...e, ...updates } : e)),
+      hasUnsavedChanges: true,
     }));
   },
 
   deleteEnum: (id) => {
     set((state) => ({
       enums: state.enums.filter((e) => e.id !== id),
+      hasUnsavedChanges: true,
     }));
   },
 
   addAssociationTable: (table) => {
     set((state) => ({
       associationTables: [...state.associationTables, table],
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -198,12 +214,14 @@ export const useSchemaStore = create<SchemaState>()(
       associationTables: state.associationTables.map((t) =>
         t.name === name ? { ...t, ...updates } : t
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
   deleteAssociationTable: (name) => {
     set((state) => ({
       associationTables: state.associationTables.filter((t) => t.name !== name),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -212,12 +230,14 @@ export const useSchemaStore = create<SchemaState>()(
       models: state.models.map((m) =>
         m.id === id ? { ...m, position } : m
       ),
+      hasUnsavedChanges: true,
     }));
   },
 
   updateEnumPosition: (id, position) => {
     set((state) => ({
       enums: state.enums.map((e) => (e.id === id ? { ...e, position } : e)),
+      hasUnsavedChanges: true,
     }));
   },
 
@@ -226,6 +246,7 @@ export const useSchemaStore = create<SchemaState>()(
       models,
       enums,
       associationTables,
+      hasUnsavedChanges: false,
     });
   },
 
@@ -234,7 +255,12 @@ export const useSchemaStore = create<SchemaState>()(
       models: [],
       enums: [],
       associationTables: [],
+      hasUnsavedChanges: true,
     });
+  },
+
+  markAsSaved: () => {
+    set({ hasUnsavedChanges: false });
   },
 }),
     {
