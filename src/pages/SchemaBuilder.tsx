@@ -29,7 +29,13 @@ const nodeTypes = {
   enum: EnumNode,
 } as NodeTypes;
 
-export default function SchemaBuilder() {
+interface SchemaBuilderProps {
+  isWorkflowMode?: boolean;
+  onNext?: () => void;
+  onPrevious?: () => void;
+}
+
+export default function SchemaBuilder({ isWorkflowMode = false, onNext, onPrevious }: SchemaBuilderProps = {}) {
   const [searchParams] = useSearchParams();
   const models = useSchemaStore((state) => state.models);
   const enums = useSchemaStore((state) => state.enums);
@@ -163,40 +169,73 @@ export default function SchemaBuilder() {
   }
 
   return (
-    <div className="w-full h-full relative flex overflow-hidden">
-      <div className="flex-1 relative">
-        <SchemaToolbar />
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onNodeDragStop={onNodeDragStop}
-          onNodeClick={onNodeClick}
-          onPaneClick={onPaneClick}
-          nodeTypes={nodeTypes}
-          connectOnClick={false}
-          nodesConnectable={false}
-          fitView
-        >
-          <Background />
-          <Controls />
-          <MiniMap />
-        </ReactFlow>
+    <div className="w-full h-full relative flex flex-col overflow-hidden">
+      <div className="flex-1 relative flex overflow-hidden">
+        <div className="flex-1 relative">
+          <SchemaToolbar />
+          <ReactFlow
+            nodes={nodes}
+            edges={edges}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onNodeDragStop={onNodeDragStop}
+            onNodeClick={onNodeClick}
+            onPaneClick={onPaneClick}
+            nodeTypes={nodeTypes}
+            connectOnClick={false}
+            nodesConnectable={false}
+            fitView
+          >
+            <Background />
+            <Controls />
+            <MiniMap />
+          </ReactFlow>
+        </div>
+
+        {selectedNode && selectedNode.type === "model" && (
+          <ModelEditor
+            modelId={selectedNode.id}
+            onClose={() => setSelectedNode(null)}
+          />
+        )}
+
+        {selectedNode && selectedNode.type === "enum" && (
+          <EnumEditor
+            enumId={selectedNode.id}
+            onClose={() => setSelectedNode(null)}
+          />
+        )}
       </div>
 
-      {selectedNode && selectedNode.type === "model" && (
-        <ModelEditor
-          modelId={selectedNode.id}
-          onClose={() => setSelectedNode(null)}
-        />
-      )}
+      {/* Workflow Navigation */}
+      {isWorkflowMode && (
+        <div className="bg-white border-t border-secondary-200 p-4 shadow-lg">
+          <div className="max-w-7xl mx-auto flex items-center justify-between">
+            <button
+              onClick={onPrevious}
+              className="px-6 py-2.5 rounded-lg font-medium text-secondary-700 hover:bg-secondary-100 transition flex items-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Previous
+            </button>
 
-      {selectedNode && selectedNode.type === "enum" && (
-        <EnumEditor
-          enumId={selectedNode.id}
-          onClose={() => setSelectedNode(null)}
-        />
+            <div className="text-sm text-secondary-600">
+              Design your database schema using the visual builder
+            </div>
+
+            <button
+              onClick={onNext}
+              className="px-6 py-2.5 rounded-lg font-medium bg-primary-500 hover:bg-primary-600 text-white shadow-primary-glow transition flex items-center gap-2"
+            >
+              Next
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

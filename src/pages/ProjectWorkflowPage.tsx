@@ -208,36 +208,112 @@ export default function ProjectWorkflowPage() {
       <div className="flex-1 overflow-auto">
         {workflowStep === "schema-builder" ? (
           <div className="h-full">
-            <SchemaBuilder />
+            <SchemaBuilder
+              isWorkflowMode={true}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+            />
           </div>
         ) : workflowStep === "code-generation" ? (
           <div className="max-w-4xl mx-auto py-8 px-4">
             <div className="bg-white rounded-lg shadow-lg border border-secondary-200 p-8">
-              <h2 className="text-2xl font-bold text-secondary-900 mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-secondary-900 mb-6 flex items-center gap-2">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                 </svg>
                 Generate Your FastAPI Project
               </h2>
 
-              <div className="text-center py-12">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-secondary-100 rounded-full mb-4">
-                  <svg className="w-10 h-10 text-secondary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                  </svg>
+              <div className="space-y-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h3 className="text-sm font-semibold text-blue-900 mb-2">Ready to Generate</h3>
+                  <p className="text-sm text-blue-700">
+                    Your project configuration and schema are complete. Click the button below to generate your FastAPI project code.
+                  </p>
                 </div>
-                <h3 className="text-lg font-semibold text-secondary-900 mb-2">Code Generation Coming Soon</h3>
-                <p className="text-secondary-600 max-w-md mx-auto mb-8">
-                  This feature will generate a complete, production-ready FastAPI project based on your schema and configuration. For now, you can export your schema as JSON and use it with our code generation API.
-                </p>
 
-                <div className="flex justify-center gap-3">
-                  <button
-                    onClick={handleFinish}
-                    className="px-6 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium shadow-primary-glow"
-                  >
-                    Finish & View Project
-                  </button>
+                <div className="border-t border-secondary-200 pt-6">
+                  <h3 className="text-lg font-semibold text-secondary-900 mb-4">What will be generated?</h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-secondary-900">SQLAlchemy Models</div>
+                        <div className="text-sm text-secondary-600">Database models with relationships and constraints</div>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-secondary-900">Pydantic Schemas</div>
+                        <div className="text-sm text-secondary-600">Request/response validation schemas</div>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-secondary-900">API Routes & CRUD Operations</div>
+                        <div className="text-sm text-secondary-600">RESTful endpoints for all models</div>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-secondary-900">Authentication & Security</div>
+                        <div className="text-sm text-secondary-600">JWT tokens, password hashing, and protected routes</div>
+                      </div>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 text-green-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <div className="font-medium text-secondary-900">Database Migrations</div>
+                        <div className="text-sm text-secondary-600">Alembic configuration and initial migration</div>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="border-t border-secondary-200 pt-6">
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                    <div className="flex items-start gap-2">
+                      <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <div className="text-sm text-yellow-800">
+                        <strong>Note:</strong> Code generation is currently in development. This button will trigger the generation API in the future.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center gap-4">
+                    <button
+                      onClick={() => {
+                        alert("Code generation API will be integrated here. For now, you can export your schema as JSON from the Schema Builder.");
+                      }}
+                      className="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium shadow-lg flex items-center gap-2"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                      </svg>
+                      Generate Project Code
+                    </button>
+                    <button
+                      onClick={handleFinish}
+                      className="px-8 py-3 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition font-medium shadow-primary-glow"
+                    >
+                      Skip & Finish
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
