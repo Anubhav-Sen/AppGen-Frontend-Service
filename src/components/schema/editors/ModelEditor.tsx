@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSchemaStore } from "@/stores/schemaStore";
-import type { ModelWithUI, Column, EnumDefinition } from "@/types/fastapiSpec";
+import type { ModelWithUI, EnumDefinition } from "@/types/fastapiSpec";
 import ColumnEditor, { type ColumnWithRelationship } from "./ColumnEditor";
 import RelationshipEditor, { type RelationshipWithFK } from "./RelationshipEditor";
 
@@ -106,38 +106,6 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
   const handleDeleteColumn = (index: number) => {
     const updatedColumns = model.columns.filter((_, i) => i !== index);
     updateModel(modelId, { columns: updatedColumns });
-  };
-
-  const handleAddRelationship = (result: RelationshipWithFK) => {
-    const { relationship, fkColumn, fkTargetModelId, reverseRelationship, reverseTargetModelId } = result;
-
-    // Add the relationship to the current model
-    const updatedRelationships = [...(model.relationships || []), relationship];
-    updateModel(modelId, { relationships: updatedRelationships });
-
-    // Add FK column to the appropriate model if specified
-    if (fkColumn && fkTargetModelId) {
-      const targetModel = models.find((m) => m.id === fkTargetModelId);
-      if (targetModel) {
-        // Check if column already exists
-        const columnExists = targetModel.columns.some((c) => c.name === fkColumn.name);
-        if (!columnExists) {
-          const updatedColumns = [...targetModel.columns, fkColumn];
-          updateModel(fkTargetModelId, { columns: updatedColumns });
-        }
-      }
-    }
-
-    // Add reverse relationship to target model if back_populates was specified
-    if (reverseRelationship && reverseTargetModelId) {
-      const targetModel = models.find((m) => m.id === reverseTargetModelId);
-      if (targetModel) {
-        const updatedTargetRelationships = [...(targetModel.relationships || []), reverseRelationship];
-        updateModel(reverseTargetModelId, { relationships: updatedTargetRelationships });
-      }
-    }
-
-    setShowRelationshipForm(false);
   };
 
   const handleUpdateRelationship = (index: number, result: RelationshipWithFK) => {

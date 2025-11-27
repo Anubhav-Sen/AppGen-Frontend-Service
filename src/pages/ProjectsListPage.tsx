@@ -45,7 +45,7 @@ const ProjectsListPage: React.FC = () => {
     };
 
     const handleProjectClick = (project: SchemaProject) => {
-        navigate(`/builder?projectId=${project.id}`);
+        navigate(`/project?projectId=${project.id}`);
     };
 
     const handleDeleteProject = (e: React.MouseEvent, projectId: number) => {

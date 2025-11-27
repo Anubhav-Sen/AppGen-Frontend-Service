@@ -10,6 +10,7 @@ import ProjectsListPage from "@/pages/ProjectsListPage";
 import SchemaBuilder from "@/pages/SchemaBuilder";
 import ConfigPage from "@/pages/ConfigPage";
 import ManageAccountPage from "@/pages/ManageAccountPage";
+import ProjectPage from "@/pages/ProjectPage";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,14 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <ProjectsListPage />
+          </ProtectedRoute>
+        )
+      },
+      {
+        path: "/project",
+        element: (
+          <ProtectedRoute>
+            <ProjectPage />
           </ProtectedRoute>
         )
       },

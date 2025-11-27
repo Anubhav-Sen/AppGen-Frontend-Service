@@ -33,6 +33,7 @@ export default function SchemaBuilder() {
   const [searchParams] = useSearchParams();
   const models = useSchemaStore((state) => state.models);
   const enums = useSchemaStore((state) => state.enums);
+  const hasUnsavedChanges = useSchemaStore((state) => state.hasUnsavedChanges);
   const updateModelPosition = useSchemaStore((state) => state.updateModelPosition);
   const updateEnumPosition = useSchemaStore((state) => state.updateEnumPosition);
   const loadSchema = useSchemaStore((state) => state.loadSchema);
@@ -92,6 +93,22 @@ export default function SchemaBuilder() {
         });
     }
   }, [searchParams, loadProject, loadConfig, loadSchema]);
+
+  // Warn user before leaving page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [hasUnsavedChanges]);
 
   const initialNodes = useMemo(() => {
     return [...modelsToNodes(models), ...enumsToNodes(enums)];
