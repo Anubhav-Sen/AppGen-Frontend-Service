@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useProjectStore } from "@/stores/projectStore";
+import { useProjectStore, type WorkflowStep } from "@/stores/projectStore";
 import { useConfigStore } from "@/stores/configStore";
 import { schemas } from "@/api/schemas";
 import { nanoid } from "nanoid";
@@ -16,6 +16,17 @@ import SchemaBuilder from "./SchemaBuilder";
 type Tab = "overview" | "config" | "schema" | "generate";
 type ConfigTab = "project" | "database" | "security" | "token" | "git";
 
+const WORKFLOW_LABELS: Record<WorkflowStep, string> = {
+  "project-config": "Project Settings",
+  "database-config": "Database Configuration",
+  "security-config": "Security Configuration",
+  "token-config": "Token Configuration",
+  "git-config": "Git Configuration",
+  "schema-builder": "Schema Design",
+  "code-generation": "Code Generation",
+  "complete": "Complete",
+};
+
 export default function ProjectPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -23,9 +34,13 @@ export default function ProjectPage() {
   const [activeConfigTab, setActiveConfigTab] = useState<ConfigTab>("project");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { currentProject, loadProject } = useProjectStore();
+  const { currentProject, loadProject, workflowStep } = useProjectStore();
   const { loadConfig } = useConfigStore();
   const { loadSchema } = useSchemaStore();
+
+  const handleContinueWorkflow = () => {
+    navigate("/project/new");
+  };
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: "overview", label: "Overview", icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" },
@@ -112,24 +127,35 @@ export default function ProjectPage() {
       {/* Tab Navigation */}
       <div className="bg-white border-b border-secondary-200">
         <div className="max-w-7xl mx-auto px-4">
-          <nav className="flex -mb-px">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
-                  activeTab === tab.id
-                    ? "border-primary-500 text-primary-600"
-                    : "border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300"
-                }`}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
-                </svg>
-                {tab.label}
-              </button>
-            ))}
-          </nav>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/projects")}
+              className="p-2 text-secondary-600 hover:text-secondary-900 hover:bg-secondary-100 rounded-lg transition-colors"
+              title="Back to projects"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </button>
+            <nav className="flex -mb-px flex-1">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors flex items-center gap-2 ${
+                    activeTab === tab.id
+                      ? "border-primary-500 text-primary-600"
+                      : "border-transparent text-secondary-500 hover:text-secondary-700 hover:border-secondary-300"
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
+                  </svg>
+                  {tab.label}
+                </button>
+              ))}
+            </nav>
+          </div>
         </div>
       </div>
 
@@ -141,7 +167,59 @@ export default function ProjectPage() {
               <h2 className="text-2xl font-bold text-secondary-900 mb-4">Project Overview</h2>
 
               {currentProject ? (
-                <div className="space-y-4">
+                <div className="space-y-6">
+                  {/* Project Progress */}
+                  {workflowStep !== "complete" && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h3 className="text-sm font-semibold text-blue-900">Project Setup In Progress</h3>
+                          <p className="text-sm text-blue-700 mt-1">
+                            Current Step: {WORKFLOW_LABELS[workflowStep]}
+                          </p>
+                        </div>
+                        <button
+                          onClick={handleContinueWorkflow}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition"
+                        >
+                          Continue Setup
+                        </button>
+                      </div>
+                      <div className="mt-3">
+                        <div className="flex justify-between text-xs text-blue-600 mb-1">
+                          <span>Progress</span>
+                          <span>{Math.round((Object.keys(WORKFLOW_LABELS).indexOf(workflowStep) / (Object.keys(WORKFLOW_LABELS).length - 1)) * 100)}%</span>
+                        </div>
+                        <div className="h-2 bg-blue-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600 transition-all duration-300"
+                            style={{
+                              width: `${(Object.keys(WORKFLOW_LABELS).indexOf(workflowStep) / (Object.keys(WORKFLOW_LABELS).length - 1)) * 100}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {workflowStep === "complete" && (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <div>
+                          <h3 className="text-sm font-semibold text-green-900">Project Setup Complete</h3>
+                          <p className="text-sm text-green-700">All configuration steps have been completed.</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <label className="block text-sm font-medium text-secondary-700 mb-1">Project Name</label>
                     <div className="text-lg text-secondary-900">{currentProject.name}</div>

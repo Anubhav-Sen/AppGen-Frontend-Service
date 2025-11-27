@@ -25,7 +25,7 @@ export default function ConfigPage() {
   ];
 
   const handleContinue = () => {
-    setWorkflowStep("schema");
+    setWorkflowStep("schema-builder");
     navigate("/builder");
   };
 

@@ -41,7 +41,7 @@ const ProjectsListPage: React.FC = () => {
         resetConfig();
         clearSchema();
         clearProject();
-        navigate("/config");
+        navigate("/project/new");
     };
 
     const handleProjectClick = (project: SchemaProject) => {
