@@ -51,10 +51,11 @@ function getBestHandles(
   }
 }
 
-export function relationshipsToEdges(models: ModelWithUI[]): SchemaEdge[] {
+export function relationshipsToEdges(models: ModelWithUI[], enums: EnumWithUI[]): SchemaEdge[] {
   const edges: SchemaEdge[] = [];
 
   models.forEach((model) => {
+    // Add relationship edges
     model.relationships?.forEach((rel) => {
       const targetModel = models.find((m) => m.name === rel.target);
       if (targetModel) {
@@ -76,6 +77,33 @@ export function relationshipsToEdges(models: ModelWithUI[]): SchemaEdge[] {
             targetModel: targetModel.name,
           },
         });
+      }
+    });
+
+    // Add enum relationship edges
+    model.columns.forEach((column) => {
+      if (column.type.enum_class) {
+        const targetEnum = enums.find((e) => e.name === column.type.enum_class);
+        if (targetEnum) {
+          const sourcePos = model.position || { x: 0, y: 0 };
+          const targetPos = targetEnum.position || { x: 0, y: 0 };
+          const { sourceHandle, targetHandle } = getBestHandles(sourcePos, targetPos);
+
+          edges.push({
+            id: `${model.id}-${column.name}-enum-${targetEnum.id}`,
+            source: model.id,
+            target: targetEnum.id,
+            sourceHandle,
+            targetHandle,
+            type: "smoothstep",
+            style: { stroke: "#a855f7", strokeWidth: 2, strokeDasharray: "5,5" },
+            data: {
+              relationshipName: column.name,
+              sourceModel: model.name,
+              targetModel: targetEnum.name,
+            },
+          });
+        }
       }
     });
   });

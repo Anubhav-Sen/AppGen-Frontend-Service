@@ -98,8 +98,8 @@ export default function SchemaBuilder() {
   }, [models, enums]);
 
   const initialEdges = useMemo(() => {
-    return relationshipsToEdges(models);
-  }, [models]);
+    return relationshipsToEdges(models, enums);
+  }, [models, enums]);
 
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);

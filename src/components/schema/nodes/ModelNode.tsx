@@ -41,6 +41,11 @@ function ModelNode({ data, selected }: NodeProps) {
                     PK
                   </span>
                 )}
+                {column.foreign_key && (
+                  <span className="text-xs bg-blue-100 text-blue-700 px-1 rounded">
+                    FK
+                  </span>
+                )}
               </div>
             ))}
             {model.columns.length > 5 && (
@@ -56,11 +61,21 @@ function ModelNode({ data, selected }: NodeProps) {
         <div className="px-4 py-2 border-t border-gray-100">
           <div className="text-xs text-gray-500 font-medium mb-1">Relationships</div>
           <div className="space-y-1">
-            {model.relationships.slice(0, 3).map((rel: any) => (
-              <div key={rel.name} className="text-xs text-gray-600">
-                {rel.name} → {rel.target}
-              </div>
-            ))}
+            {model.relationships.slice(0, 3).map((rel: any) => {
+              // Find the FK column for this relationship
+              const fkColumn = model.columns.find((col: any) =>
+                col.foreign_key && col.foreign_key.startsWith(rel.target.toLowerCase())
+              );
+              const sourceColumn = fkColumn ? fkColumn.name : '?';
+              // Extract target column from foreign_key (format: tablename.column)
+              const targetColumn = fkColumn?.foreign_key?.split('.')[1] || '?';
+
+              return (
+                <div key={rel.name} className="text-xs text-gray-600">
+                  {model.tablename}.{sourceColumn} → {rel.target.toLowerCase()}.{targetColumn}
+                </div>
+              );
+            })}
             {model.relationships.length > 3 && (
               <div className="text-xs text-gray-400 italic">
                 +{model.relationships.length - 3} more...

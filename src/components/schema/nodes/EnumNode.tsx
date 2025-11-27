@@ -12,7 +12,15 @@ function EnumNode({ data, selected }: NodeProps) {
         selected ? "border-purple-500 shadow-lg shadow-purple-100" : "border-secondary-300 shadow-md hover:shadow-lg"
       }`}
     >
-      <Handle type="target" position={Position.Top} className="w-3 h-3" />
+      {/* Multiple handles on each side for cleaner edge routing */}
+      <Handle type="source" position={Position.Top} id="top" className="w-2 h-2 !bg-purple-400" />
+      <Handle type="target" position={Position.Top} id="top" className="w-2 h-2 !bg-purple-400" />
+      <Handle type="source" position={Position.Bottom} id="bottom" className="w-2 h-2 !bg-purple-400" />
+      <Handle type="target" position={Position.Bottom} id="bottom" className="w-2 h-2 !bg-purple-400" />
+      <Handle type="source" position={Position.Left} id="left" className="w-2 h-2 !bg-purple-400" />
+      <Handle type="target" position={Position.Left} id="left" className="w-2 h-2 !bg-purple-400" />
+      <Handle type="source" position={Position.Right} id="right" className="w-2 h-2 !bg-purple-400" />
+      <Handle type="target" position={Position.Right} id="right" className="w-2 h-2 !bg-purple-400" />
 
       <div className="bg-purple-50 px-4 py-2 border-b border-secondary-200">
         <div className="font-semibold text-secondary-800 flex items-center gap-2">
@@ -41,8 +49,6 @@ function EnumNode({ data, selected }: NodeProps) {
           </div>
         )}
       </div>
-
-      <Handle type="source" position={Position.Bottom} className="w-3 h-3" />
     </div>
   );
 }

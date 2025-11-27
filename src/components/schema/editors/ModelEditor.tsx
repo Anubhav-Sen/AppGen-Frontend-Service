@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSchemaStore } from "@/stores/schemaStore";
 import type { ModelWithUI, Column, EnumDefinition } from "@/types/fastapiSpec";
-import ColumnEditor from "./ColumnEditor";
+import ColumnEditor, { type ColumnWithRelationship } from "./ColumnEditor";
 import RelationshipEditor, { type RelationshipWithFK } from "./RelationshipEditor";
 
 interface ModelEditorProps {
@@ -20,24 +20,86 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
   const [editingColumnIndex, setEditingColumnIndex] = useState<number | null>(null);
   const [editingRelationshipIndex, setEditingRelationshipIndex] = useState<number | null>(null);
   const [showColumnForm, setShowColumnForm] = useState(false);
-  const [showRelationshipForm, setShowRelationshipForm] = useState(false);
 
   if (!model) return null;
 
   const handleUpdateField = (field: keyof ModelWithUI, value: any) => {
     updateModel(modelId, { [field]: value });
+
+    // Auto-set machine name based on model name
+    if (field === "name" && value) {
+      // Convert ModelName to model_name format
+      const machineName = value
+        .replace(/([A-Z])/g, '_$1')  // Add underscore before capital letters
+        .toLowerCase()
+        .replace(/^_/, '');  // Remove leading underscore if exists
+      updateModel(modelId, { tablename: machineName });
+    }
   };
 
-  const handleAddColumn = (column: Column) => {
-    const updatedColumns = [...model.columns, column];
+  const handleAddColumn = (data: ColumnWithRelationship) => {
+    const updatedColumns = [...model.columns, data.column];
     updateModel(modelId, { columns: updatedColumns });
+
+    // Add relationship if provided
+    if (data.relationship) {
+      const updatedRelationships = [...(model.relationships || []), data.relationship];
+      updateModel(modelId, { relationships: updatedRelationships });
+    }
+
+    // Add reverse relationship to target model if provided
+    if (data.reverseRelationship && data.reverseTargetModelId) {
+      const targetModel = models.find((m) => m.id === data.reverseTargetModelId);
+      if (targetModel) {
+        const updatedTargetRelationships = [...(targetModel.relationships || []), data.reverseRelationship];
+        updateModel(data.reverseTargetModelId, { relationships: updatedTargetRelationships });
+      }
+    }
+
     setShowColumnForm(false);
   };
 
-  const handleUpdateColumn = (index: number, column: Column) => {
+  const handleUpdateColumn = (index: number, data: ColumnWithRelationship) => {
     const updatedColumns = [...model.columns];
-    updatedColumns[index] = column;
+    updatedColumns[index] = data.column;
     updateModel(modelId, { columns: updatedColumns });
+
+    // Update relationship if provided
+    if (data.relationship) {
+      // Find and update existing relationship or add new one
+      const existingRelIndex = (model.relationships || []).findIndex(
+        r => r.target === data.relationship!.target
+      );
+
+      let updatedRelationships;
+      if (existingRelIndex >= 0) {
+        updatedRelationships = [...(model.relationships || [])];
+        updatedRelationships[existingRelIndex] = data.relationship;
+      } else {
+        updatedRelationships = [...(model.relationships || []), data.relationship];
+      }
+      updateModel(modelId, { relationships: updatedRelationships });
+    }
+
+    // Handle reverse relationship
+    if (data.reverseRelationship && data.reverseTargetModelId) {
+      const targetModel = models.find((m) => m.id === data.reverseTargetModelId);
+      if (targetModel) {
+        const existingReverseRelIndex = (targetModel.relationships || []).findIndex(
+          r => r.name === data.reverseRelationship!.name
+        );
+
+        let updatedTargetRelationships;
+        if (existingReverseRelIndex >= 0) {
+          updatedTargetRelationships = [...(targetModel.relationships || [])];
+          updatedTargetRelationships[existingReverseRelIndex] = data.reverseRelationship;
+        } else {
+          updatedTargetRelationships = [...(targetModel.relationships || []), data.reverseRelationship];
+        }
+        updateModel(data.reverseTargetModelId, { relationships: updatedTargetRelationships });
+      }
+    }
+
     setEditingColumnIndex(null);
   };
 
@@ -86,6 +148,25 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
   };
 
   const handleDeleteRelationship = (index: number) => {
+    const relationship = model.relationships?.[index];
+
+    if (relationship) {
+      // Find and delete the associated foreign key column
+      const targetModel = models.find(m => m.name === relationship.target);
+      if (targetModel) {
+        const fkColumn = model.columns.find(col =>
+          col.foreign_key && col.foreign_key.startsWith(targetModel.tablename)
+        );
+
+        if (fkColumn) {
+          // Remove the FK column
+          const updatedColumns = model.columns.filter(col => col.name !== fkColumn.name);
+          updateModel(modelId, { columns: updatedColumns });
+        }
+      }
+    }
+
+    // Remove the relationship
     const updatedRelationships = (model.relationships || []).filter((_, i) => i !== index);
     updateModel(modelId, { relationships: updatedRelationships });
   };
@@ -129,13 +210,14 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-secondary-700 mb-1">Table Name</label>
+          <label className="block text-xs font-medium text-secondary-700 mb-1">Machine Name</label>
           <input
             type="text"
             value={model.tablename}
             onChange={(e) => handleUpdateField("tablename", e.target.value)}
             className="w-full px-2 py-1.5 text-sm border border-secondary-300 rounded focus:outline-none focus:ring-1 focus:ring-primary-500"
           />
+          <p className="mt-0.5 text-xs text-gray-500">Database table name</p>
         </div>
 
         <div>
@@ -156,6 +238,8 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
             <ColumnEditor
               models={models}
               currentModelId={modelId}
+              currentModelName={model.name}
+              currentTableName={model.tablename}
               enums={enums}
               onSave={handleAddColumn}
               onCancel={() => setShowColumnForm(false)}
@@ -164,19 +248,32 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
           )}
 
           <div className="space-y-2">
-            {model.columns.map((column, index) => (
-              <div key={index}>
-                {editingColumnIndex === index ? (
-                  <ColumnEditor
-                    column={column}
-                    models={models}
-                    currentModelId={modelId}
-                    enums={enums}
-                    onSave={(col) => handleUpdateColumn(index, col)}
-                    onCancel={() => setEditingColumnIndex(null)}
-                    onCreateEnum={handleCreateEnum}
-                  />
-                ) : (
+            {model.columns.map((column, index) => {
+              // Find existing relationship for this column if it's a FK
+              const existingRelationship = column.foreign_key
+                ? model.relationships?.find(r => {
+                    const targetTableName = column.foreign_key?.split('.')[0];
+                    const targetModel = models.find(m => m.tablename === targetTableName);
+                    return targetModel && r.target === targetModel.name;
+                  })
+                : undefined;
+
+              return (
+                <div key={index}>
+                  {editingColumnIndex === index ? (
+                    <ColumnEditor
+                      column={column}
+                      models={models}
+                      currentModelId={modelId}
+                      currentModelName={model.name}
+                      currentTableName={model.tablename}
+                      enums={enums}
+                      existingRelationship={existingRelationship}
+                      onSave={(data) => handleUpdateColumn(index, data)}
+                      onCancel={() => setEditingColumnIndex(null)}
+                      onCreateEnum={handleCreateEnum}
+                    />
+                  ) : (
                   <div className="flex items-center justify-between p-2 bg-secondary-50 rounded-lg border border-secondary-300 shadow-sm">
                     <div className="flex-1">
                       <div className="font-medium text-xs text-secondary-800">{column.name}</div>
@@ -202,36 +299,17 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
                       </button>
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
         <div>
           <div className="flex justify-between items-center mb-2">
             <label className="block text-xs font-medium text-secondary-700">Relationships</label>
-            <button
-              onClick={() => setShowRelationshipForm(true)}
-              className="text-xs px-2 py-1 bg-purple-500 text-white rounded hover:bg-purple-600 flex items-center gap-1"
-            >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Add
-            </button>
           </div>
-
-          {showRelationshipForm && (
-            <RelationshipEditor
-              models={models}
-              currentModelId={modelId}
-              currentModelName={model.name}
-              currentTableName={model.tablename}
-              onSave={handleAddRelationship}
-              onCancel={() => setShowRelationshipForm(false)}
-            />
-          )}
 
           <div className="space-y-2">
             {(model.relationships || []).map((relationship, index) => (
@@ -273,6 +351,9 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
                 )}
               </div>
             ))}
+            {(model.relationships || []).length === 0 && (
+              <p className="text-xs text-gray-500 italic">Relationships are created automatically when you set a foreign key reference on a column.</p>
+            )}
           </div>
         </div>
 
