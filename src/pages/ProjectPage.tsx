@@ -137,6 +137,14 @@ export default function ProjectPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
             </button>
+            {currentProject && (
+              <div className="flex items-center gap-2 px-3 py-2 bg-secondary-100 rounded-lg">
+                <svg className="w-4 h-4 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                </svg>
+                <span className="text-sm font-medium text-secondary-900">{currentProject.name}</span>
+              </div>
+            )}
             <nav className="flex -mb-px flex-1">
               {tabs.map((tab) => (
                 <button

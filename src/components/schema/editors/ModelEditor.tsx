@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSchemaStore } from "@/stores/schemaStore";
-import type { ModelWithUI, EnumDefinition } from "@/types/fastapiSpec";
+import type { ModelWithUI } from "@/types/fastapiSpec";
 import ColumnEditor, { type ColumnWithRelationship } from "./ColumnEditor";
 import RelationshipEditor, { type RelationshipWithFK } from "./RelationshipEditor";
 
@@ -15,7 +15,6 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
   const deleteModel = useSchemaStore((state) => state.deleteModel);
   const models = useSchemaStore((state) => state.models);
   const enums = useSchemaStore((state) => state.enums);
-  const addEnum = useSchemaStore((state) => state.addEnum);
 
   const [editingColumnIndex, setEditingColumnIndex] = useState<number | null>(null);
   const [editingRelationshipIndex, setEditingRelationshipIndex] = useState<number | null>(null);
@@ -104,6 +103,38 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
   };
 
   const handleDeleteColumn = (index: number) => {
+    const columnToDelete = model.columns[index];
+
+    // If the column has a foreign key, also delete the associated relationship
+    if (columnToDelete.foreign_key) {
+      const [targetTableName] = columnToDelete.foreign_key.split('.');
+      const targetModel = models.find(m => m.tablename === targetTableName);
+
+      if (targetModel) {
+        // Find the relationship that uses this FK column
+        const relationshipToDelete = (model.relationships || []).find(
+          r => r.target === targetModel.name
+        );
+
+        if (relationshipToDelete) {
+          // Remove the relationship from current model
+          const updatedRelationships = (model.relationships || []).filter(
+            r => r.target !== targetModel.name
+          );
+          updateModel(modelId, { relationships: updatedRelationships });
+
+          // If there's a back_populates, remove the reverse relationship from target model
+          if (relationshipToDelete.back_populates) {
+            const updatedTargetRelationships = (targetModel.relationships || []).filter(
+              r => r.name !== relationshipToDelete.back_populates
+            );
+            updateModel(targetModel.id, { relationships: updatedTargetRelationships });
+          }
+        }
+      }
+    }
+
+    // Remove the column
     const updatedColumns = model.columns.filter((_, i) => i !== index);
     updateModel(modelId, { columns: updatedColumns });
   };
@@ -144,10 +175,6 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
       deleteModel(modelId);
       onClose();
     }
-  };
-
-  const handleCreateEnum = (enumDef: EnumDefinition): string => {
-    return addEnum(enumDef);
   };
 
   return (
@@ -211,7 +238,6 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
               enums={enums}
               onSave={handleAddColumn}
               onCancel={() => setShowColumnForm(false)}
-              onCreateEnum={handleCreateEnum}
             />
           )}
 
@@ -239,7 +265,6 @@ export default function ModelEditor({ modelId, onClose }: ModelEditorProps) {
                       existingRelationship={existingRelationship}
                       onSave={(data) => handleUpdateColumn(index, data)}
                       onCancel={() => setEditingColumnIndex(null)}
-                      onCreateEnum={handleCreateEnum}
                     />
                   ) : (
                   <div className="flex items-center justify-between p-2 bg-secondary-50 rounded-lg border border-secondary-300 shadow-sm">

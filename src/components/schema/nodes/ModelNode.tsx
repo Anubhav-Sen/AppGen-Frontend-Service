@@ -2,9 +2,11 @@ import { memo } from "react";
 import { Handle, Position } from "@xyflow/react";
 import type { NodeProps } from "@xyflow/react";
 import type { ModelNodeData } from "@/types/reactFlow";
+import { useSchemaStore } from "@/stores/schemaStore";
 
 function ModelNode({ data, selected }: NodeProps) {
   const model = (data as ModelNodeData).model;
+  const models = useSchemaStore((state) => state.models);
 
   return (
     <div
@@ -62,9 +64,13 @@ function ModelNode({ data, selected }: NodeProps) {
           <div className="text-xs text-gray-500 font-medium mb-1">Relationships</div>
           <div className="space-y-1">
             {model.relationships.slice(0, 3).map((rel: any) => {
-              // Find the FK column for this relationship
+              // Find the target model by name (rel.target is the model name, not tablename)
+              const targetModel = models.find((m) => m.name === rel.target);
+              const targetTableName = targetModel?.tablename || rel.target.toLowerCase();
+
+              // Find the FK column for this relationship by matching the target tablename
               const fkColumn = model.columns.find((col: any) =>
-                col.foreign_key && col.foreign_key.startsWith(rel.target.toLowerCase())
+                col.foreign_key && col.foreign_key.startsWith(targetTableName + '.')
               );
               const sourceColumn = fkColumn ? fkColumn.name : '?';
               // Extract target column from foreign_key (format: tablename.column)
@@ -72,7 +78,7 @@ function ModelNode({ data, selected }: NodeProps) {
 
               return (
                 <div key={rel.name} className="text-xs text-gray-600">
-                  {model.tablename}.{sourceColumn} → {rel.target.toLowerCase()}.{targetColumn}
+                  {model.tablename}.{sourceColumn} → {targetTableName}.{targetColumn}
                 </div>
               );
             })}

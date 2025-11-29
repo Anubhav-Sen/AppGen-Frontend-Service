@@ -84,7 +84,8 @@ export default function ProjectWorkflowPage() {
       const projectName = config.project.title || "Untitled Project";
       const projectDescription = config.project.description || undefined;
 
-      if (isEditMode && currentProject) {
+      if (currentProject) {
+        // Update existing project (whether in edit mode or after first creation)
         const updated = await schemas.update(currentProject.id, {
           name: projectName,
           description: projectDescription,
@@ -92,6 +93,7 @@ export default function ProjectWorkflowPage() {
         });
         setCurrentProject(updated);
       } else {
+        // Create new project only if no current project exists
         const created = await schemas.create({
           name: projectName,
           description: projectDescription,

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Column, ColumnType, ModelWithUI, EnumWithUI, EnumDefinition, Relationship, CascadeOption } from "@/types/fastapiSpec";
+import type { Column, ColumnType, ModelWithUI, EnumWithUI, Relationship, CascadeOption } from "@/types/fastapiSpec";
 import { ColumnTypeName, CascadeOption as CascadeOptions } from "@/types/fastapiSpec";
 
 export interface ColumnWithRelationship {
@@ -19,7 +19,6 @@ interface ColumnEditorProps {
   existingRelationship?: Relationship;
   onSave: (data: ColumnWithRelationship) => void;
   onCancel: () => void;
-  onCreateEnum?: (enumDef: EnumDefinition) => string;
 }
 
 const cascadeOptionLabels: Record<CascadeOption, string> = {
@@ -32,7 +31,7 @@ const cascadeOptionLabels: Record<CascadeOption, string> = {
   [CascadeOptions.ALL]: "All",
 };
 
-export default function ColumnEditor({ column, models = [], currentModelId, currentModelName, currentTableName, enums = [], existingRelationship, onSave, onCancel, onCreateEnum }: ColumnEditorProps) {
+export default function ColumnEditor({ column, models = [], currentModelId, currentModelName, currentTableName, enums = [], existingRelationship, onSave, onCancel }: ColumnEditorProps) {
   const [name, setName] = useState(column?.name || "");
   const [typeName, setTypeName] = useState<string>(column?.type.name || ColumnTypeName.STRING);
   const [length, setLength] = useState(column?.type.length?.toString() || "");
@@ -53,12 +52,6 @@ export default function ColumnEditor({ column, models = [], currentModelId, curr
   const [backPopulates, setBackPopulates] = useState(existingRelationship?.back_populates || "");
   const [cascade, setCascade] = useState<CascadeOption[]>(existingRelationship?.cascade || []);
 
-  // Inline enum creation state
-  const [showEnumCreator, setShowEnumCreator] = useState(false);
-  const [newEnumName, setNewEnumName] = useState("");
-  const [newEnumValues, setNewEnumValues] = useState<string[]>([]);
-  const [newEnumValue, setNewEnumValue] = useState("");
-
   // Auto-enable relationship creation when FK is selected
   useEffect(() => {
     if (foreignKey) {
@@ -72,27 +65,6 @@ export default function ColumnEditor({ column, models = [], currentModelId, curr
         ? prev.filter((o) => o !== option)
         : [...prev, option]
     );
-  };
-
-  const handleAddEnumValue = () => {
-    if (newEnumValue && !newEnumValues.includes(newEnumValue)) {
-      setNewEnumValues([...newEnumValues, newEnumValue]);
-      setNewEnumValue("");
-    }
-  };
-
-  const handleRemoveEnumValue = (index: number) => {
-    setNewEnumValues(newEnumValues.filter((_, i) => i !== index));
-  };
-
-  const handleCreateEnum = () => {
-    if (newEnumName && newEnumValues.length > 0 && onCreateEnum) {
-      onCreateEnum({ name: newEnumName, values: newEnumValues });
-      setEnumClass(newEnumName);
-      setShowEnumCreator(false);
-      setNewEnumName("");
-      setNewEnumValues([]);
-    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -188,8 +160,17 @@ export default function ColumnEditor({ column, models = [], currentModelId, curr
   const typeNeedsDecimal = [ColumnTypeName.NUMERIC].includes(typeName as any);
   const typeIsEnum = typeName === ColumnTypeName.ENUM;
 
+  const isPrimaryKey = column?.primary_key || false;
+
   return (
     <form onSubmit={handleSubmit} className="p-3 bg-blue-50 rounded-lg border border-blue-300 shadow-sm space-y-2">
+      {isPrimaryKey && (
+        <div className="p-2 bg-yellow-50 border border-yellow-300 rounded">
+          <p className="text-xs text-yellow-800 font-medium">
+            ⚠️ Primary key column - editing is restricted
+          </p>
+        </div>
+      )}
       <div>
         <label className="block text-xs font-medium text-gray-700 mb-1">Column Name</label>
         <input
@@ -199,7 +180,8 @@ export default function ColumnEditor({ column, models = [], currentModelId, curr
           required
           pattern="^[a-z0-9_]+$"
           title="Column name must contain only lowercase letters, numbers, and underscores"
-          className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+          disabled={isPrimaryKey}
+          className={`w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${isPrimaryKey ? 'bg-gray-100 cursor-not-allowed' : ''}`}
         />
         <p className="mt-0.5 text-xs text-gray-500">Only lowercase letters, numbers (0-9), and underscores allowed</p>
       </div>
@@ -210,7 +192,8 @@ export default function ColumnEditor({ column, models = [], currentModelId, curr
           <select
             value={foreignKey}
             onChange={(e) => setForeignKey(e.target.value)}
-            className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+            disabled={isPrimaryKey}
+            className={`w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${isPrimaryKey ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           >
             <option value="">None</option>
             {models
@@ -238,7 +221,8 @@ export default function ColumnEditor({ column, models = [], currentModelId, curr
             <select
               value={typeName}
               onChange={(e) => setTypeName(e.target.value)}
-              className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+              disabled={isPrimaryKey}
+              className={`w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 ${isPrimaryKey ? 'bg-gray-100 cursor-not-allowed' : ''}`}
             >
               {Object.values(ColumnTypeName).map((type) => (
                 <option key={type} value={type}>
@@ -286,91 +270,20 @@ export default function ColumnEditor({ column, models = [], currentModelId, curr
           {typeIsEnum && (
             <div>
               <label className="block text-xs font-medium text-gray-700 mb-1">Enum Type</label>
-              <div className="flex gap-2">
-                <select
-                  value={enumClass}
-                  onChange={(e) => setEnumClass(e.target.value)}
-                  className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
-                >
-                  <option value="">Select enum...</option>
-                  {enums.map((e) => (
-                    <option key={e.id} value={e.name}>
-                      {e.name} ({e.values.length} values)
-                    </option>
-                  ))}
-                </select>
-                {onCreateEnum && (
-                  <button
-                    type="button"
-                    onClick={() => setShowEnumCreator(!showEnumCreator)}
-                    className="px-2 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600"
-                  >
-                    {showEnumCreator ? "Cancel" : "New"}
-                  </button>
-                )}
-              </div>
-
-              {showEnumCreator && (
-                <div className="mt-2 p-2 bg-purple-50 rounded-lg border border-purple-300 shadow-sm space-y-2">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Enum Name</label>
-                    <input
-                      type="text"
-                      value={newEnumName}
-                      onChange={(e) => setNewEnumName(e.target.value)}
-                      placeholder="e.g., Status, Priority"
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Values</label>
-                    <div className="flex gap-1 mb-1">
-                      <input
-                        type="text"
-                        value={newEnumValue}
-                        onChange={(e) => setNewEnumValue(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleAddEnumValue())}
-                        placeholder="Add value..."
-                        className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddEnumValue}
-                        className="px-2 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600"
-                      >
-                        +
-                      </button>
-                    </div>
-                    {newEnumValues.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {newEnumValues.map((v, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded"
-                          >
-                            {v}
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveEnumValue(i)}
-                              className="text-purple-500 hover:text-purple-700"
-                            >
-                              ×
-                            </button>
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleCreateEnum}
-                    disabled={!newEnumName || newEnumValues.length === 0}
-                    className="w-full px-2 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Create Enum
-                  </button>
-                </div>
-              )}
+              <select
+                value={enumClass}
+                onChange={(e) => setEnumClass(e.target.value)}
+                required
+                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+              >
+                <option value="">Select enum...</option>
+                {enums.map((e) => (
+                  <option key={e.id} value={e.name}>
+                    {e.name} ({e.values.length} values)
+                  </option>
+                ))}
+              </select>
+              <p className="mt-0.5 text-xs text-gray-500">Use the toolbar button to create a new enum</p>
             </div>
           )}
 
