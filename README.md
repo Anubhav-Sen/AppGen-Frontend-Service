@@ -15,6 +15,10 @@ A visual schema builder and code generator for FastAPI applications. Design your
 - **Authentication** - JWT-based auth with remember me functionality and automatic token refresh
 - **Project Management** - Save, load, and manage multiple schema projects
 
+## Architecture
+
+<img width="1762" height="601" alt="appgen-frontend drawio" src="https://github.com/user-attachments/assets/3d062db7-6018-40bb-b83e-42109ea17d52" />
+
 ## Tech Stack
 
 | Category | Technology |
